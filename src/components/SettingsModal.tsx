@@ -347,7 +347,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                 <div className="space-y-3">
                   <h4 className="text-sm font-semibold text-znr-text uppercase tracking-wide">Game Actions</h4>
                   <div className="space-y-2">
-                    {/* NEW: End Game Button */}
+                    {/* End Game Button */}
                     <button
                       onClick={handleEndGame}
                       className="w-full flex items-center gap-3 p-3 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 hover:from-yellow-500/30 hover:to-orange-500/30 border border-yellow-500/30 rounded-xl text-left transition-all"

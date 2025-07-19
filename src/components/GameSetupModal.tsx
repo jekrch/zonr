@@ -186,7 +186,7 @@ export const GameSetupModal: React.FC<GameSetupModalProps> = ({ isOpen, onClose,
                   placeholder={`Player ${index + 1}`}
                   value={name}
                   onChange={(e) => updatePlayerName(index, e.target.value)}
-                  className="flex-1 bg-znr-tertiary border border-znr-border rounded-xl px-3 md:px-4 py-2 md:py-3 text-znr-text placeholder-znr-text-muted focus:outline-none focus:border-znr-accent text-sm md:text-base"
+                  className="flex-1 bg-znr-tertiary border border-znr-border rounded-xl px-3 md:px-4 py-2 md:py-3 text-znr-text placeholder-znr-text-muted focus:outline-none focus:border-znr-accent text-base"
                 />
                 
                 {playerNames.length > 2 && (
