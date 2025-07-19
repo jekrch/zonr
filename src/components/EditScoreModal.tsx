@@ -96,7 +96,7 @@ export const EditScoreModal: React.FC<EditScoreModalProps> = ({ isOpen, onClose,
   if (!isOpen || !entry) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[80] p-4">
+    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[80] p-4 select-none">
       <div className="bg-znr-secondary border border-znr-border rounded-2xl p-4 md:p-6 max-w-sm w-full max-h-[90vh] overflow-y-auto znr-scroll-enhanced">
         <div className="flex justify-between items-center mb-4 md:mb-6">
           <h2 className="text-lg md:text-xl font-light text-znr-text">Edit Turn {entry.turn}</h2>

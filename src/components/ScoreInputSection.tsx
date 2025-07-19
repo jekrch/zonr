@@ -25,7 +25,7 @@ export const ScoreInputSection: React.FC<ScoreInputSectionProps> = ({
   getCurrentTotal
 }) => {
   return (
-    <div className="bg-znr-secondary rounded-xl md:rounded-2xl p-3 md:p-6 mb-3 md:mb-4 shadow-xl">
+    <div className="bg-znr-secondary rounded-xl md:rounded-2xl p-3 md:p-6 mb-3 md:mb-4 shadow-xl select-none">
       {scoreCategories.map(category => (
         <ScoreInputCategory
           key={category.key}

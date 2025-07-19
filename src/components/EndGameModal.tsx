@@ -15,7 +15,7 @@ interface EndGameModalProps {
 const scoreCategories = [
   { key: 'roads' as const, label: 'Roads', icon: '🛤️', color: 'text-blue-400' },
   { key: 'cities' as const, label: 'Cities', icon: '🏰', color: 'text-purple-400' },
-  { key: 'monasteries' as const, label: 'Monasteries', icon: '⛪', color: 'text-green-400' },
+  { key: 'monasteries' as const, label: 'Mnsts', icon: '⛪', color: 'text-green-400' },
   { key: 'fields' as const, label: 'Fields', icon: '🌾', color: 'text-yellow-400' }
 ];
 
@@ -237,7 +237,6 @@ const handleShare = async () => {
               Back to Game
             </button>
             
-            <h2 className="text-2xl font-bold text-znr-text">Game Complete!</h2>
             
             <div className="flex gap-2">
               <button
