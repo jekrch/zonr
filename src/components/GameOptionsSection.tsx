@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { RotateCcw, Plus, Trophy, AlertTriangle } from 'lucide-react';
+import Portal from '@/Portal';
 
 interface GameOptionsSectionProps {
   onRestartGame: () => void;
@@ -17,51 +18,52 @@ interface ConfirmDialogProps {
   danger?: boolean;
 }
 
-const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ 
-  isOpen, 
-  title, 
-  message, 
-  confirmText, 
-  onConfirm, 
-  onCancel, 
-  danger = false 
+const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
+  isOpen,
+  title,
+  message,
+  confirmText,
+  onConfirm,
+  onCancel,
+  danger = false
 }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[110] p-4">
-      <div className="bg-znr-secondary border border-znr-border rounded-2xl w-full max-w-sm shadow-2xl">
-        <div className="p-4 border-b border-znr-border">
-          <div className="flex items-center gap-3">
-            {danger && <AlertTriangle size={20} className="text-red-400 flex-shrink-0" />}
-            <h3 className="text-lg font-semibold text-znr-text">{title}</h3>
+    <Portal>
+      <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[110] p-4">
+        <div className="bg-znr-secondary border border-znr-border rounded-2xl w-full max-w-sm shadow-2xl">
+          <div className="p-4 border-b border-znr-border">
+            <div className="flex items-center gap-3">
+              {danger && <AlertTriangle size={20} className="text-red-400 flex-shrink-0" />}
+              <h3 className="text-lg font-semibold text-znr-text">{title}</h3>
+            </div>
           </div>
-        </div>
-        <div className="p-4">
-          <p className="text-sm text-znr-text-muted leading-relaxed mb-6">
-            {message}
-          </p>
-          <div className="flex gap-2">
-            <button
-              onClick={onCancel}
-              className="flex-1 bg-znr-tertiary hover:bg-znr-elevated rounded-lg px-3 py-2 text-sm text-znr-text transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={onConfirm}
-              className={`flex-1 rounded-lg px-3 py-2 text-sm transition-colors ${
-                danger 
-                  ? 'bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-300'
-                  : 'bg-znr-accent hover:bg-znr-accent-alt text-white'
-              }`}
-            >
-              {confirmText}
-            </button>
+          <div className="p-4">
+            <p className="text-sm text-znr-text-muted leading-relaxed mb-6">
+              {message}
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={onCancel}
+                className="flex-1 bg-znr-tertiary hover:bg-znr-elevated rounded-lg px-3 py-2 text-sm text-znr-text transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={onConfirm}
+                className={`flex-1 rounded-lg px-3 py-2 text-sm transition-colors ${danger
+                    ? 'bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-300'
+                    : 'bg-znr-accent hover:bg-znr-accent-alt text-white'
+                  }`}
+              >
+                {confirmText}
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </Portal>
   );
 };
 
@@ -110,7 +112,7 @@ export const GameOptionsSection: React.FC<GameOptionsSectionProps> = ({
             Game Options
           </div>
         </div>
-        
+
         <div className="p-3 md:p-4 space-y-2">
           {/* End Game Button */}
           <button
@@ -143,7 +145,7 @@ export const GameOptionsSection: React.FC<GameOptionsSectionProps> = ({
               </div>
             </div>
           </button>
-          
+
           {/* New Game Button */}
           <button
             onClick={handleNewGame}
@@ -166,20 +168,20 @@ export const GameOptionsSection: React.FC<GameOptionsSectionProps> = ({
         isOpen={confirmDialog.isOpen}
         title={
           confirmDialog.type === 'restart' ? 'Restart Game?' :
-          confirmDialog.type === 'new' ? 'Start New Game?' :
-          'End Game?'
+            confirmDialog.type === 'new' ? 'Start New Game?' :
+              'End Game?'
         }
         message={
-          confirmDialog.type === 'restart' 
+          confirmDialog.type === 'restart'
             ? 'This will reset all scores to zero but keep the current players. This action cannot be undone.'
             : confirmDialog.type === 'new'
-            ? 'This will end the current game and return to player setup. All progress will be lost.'
-            : 'This will show the final game results and celebration. You can return to the game afterwards.'
+              ? 'This will end the current game and return to player setup. All progress will be lost.'
+              : 'This will show the final game results and celebration. You can return to the game afterwards.'
         }
         confirmText={
           confirmDialog.type === 'restart' ? 'Restart' :
-          confirmDialog.type === 'new' ? 'New Game' :
-          'Show Results'
+            confirmDialog.type === 'new' ? 'New Game' :
+              'Show Results'
         }
         onConfirm={confirmAction}
         onCancel={cancelAction}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Settings, X, Palette, Info, Github, ExternalLink, RotateCcw, Plus, AlertTriangle, Trophy } from 'lucide-react';
 import { updateThemeInURL, clearGameFromURL, loadGameStateFromURL } from '../gameStateUtils';
+import Portal from '@/Portal';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -20,58 +21,59 @@ interface ConfirmDialogProps {
   danger?: boolean;
 }
 
-const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ 
-  isOpen, 
-  title, 
-  message, 
-  confirmText, 
-  onConfirm, 
-  onCancel, 
-  danger = false 
+const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
+  isOpen,
+  title,
+  message,
+  confirmText,
+  onConfirm,
+  onCancel,
+  danger = false
 }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[110] p-4">
-      <div className="bg-znr-secondary border border-znr-border rounded-2xl w-full max-w-sm shadow-2xl">
-        <div className="p-4 border-b border-znr-border">
-          <div className="flex items-center gap-3">
-            {danger && <AlertTriangle size={20} className="text-red-400 flex-shrink-0" />}
-            <h3 className="text-lg font-semibold text-znr-text">{title}</h3>
+    <Portal>
+      <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[110] p-4">
+        <div className="bg-znr-secondary border border-znr-border rounded-2xl w-full max-w-sm shadow-2xl">
+          <div className="p-4 border-b border-znr-border">
+            <div className="flex items-center gap-3">
+              {danger && <AlertTriangle size={20} className="text-red-400 flex-shrink-0" />}
+              <h3 className="text-lg font-semibold text-znr-text">{title}</h3>
+            </div>
           </div>
-        </div>
-        <div className="p-4">
-          <p className="text-sm text-znr-text-muted leading-relaxed mb-6">
-            {message}
-          </p>
-          <div className="flex gap-2">
-            <button
-              onClick={onCancel}
-              className="flex-1 bg-znr-tertiary hover:bg-znr-elevated rounded-lg px-3 py-2 text-sm text-znr-text transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={onConfirm}
-              className={`flex-1 rounded-lg px-3 py-2 text-sm transition-colors ${
-                danger 
-                  ? 'bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-300'
-                  : 'bg-znr-accent hover:bg-znr-accent-alt text-white'
-              }`}
-            >
-              {confirmText}
-            </button>
+          <div className="p-4">
+            <p className="text-sm text-znr-text-muted leading-relaxed mb-6">
+              {message}
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={onCancel}
+                className="flex-1 bg-znr-tertiary hover:bg-znr-elevated rounded-lg px-3 py-2 text-sm text-znr-text transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={onConfirm}
+                className={`flex-1 rounded-lg px-3 py-2 text-sm transition-colors ${danger
+                    ? 'bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-300'
+                    : 'bg-znr-accent hover:bg-znr-accent-alt text-white'
+                  }`}
+              >
+                {confirmText}
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </Portal>
   );
 };
 
-const SettingsModal: React.FC<SettingsModalProps> = ({ 
-  isOpen, 
-  onClose, 
-  onRestartGame, 
+const SettingsModal: React.FC<SettingsModalProps> = ({
+  isOpen,
+  onClose,
+  onRestartGame,
   onNewGame,
   onEndGame // New prop
 }) => {
@@ -93,7 +95,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   useEffect(() => {
     const { gameState, theme: urlTheme } = loadGameStateFromURL();
     let themeToUse: string;
-    
+
     if (gameState) {
       // If there's a game in URL, always use the URL theme (even if it's 'default')
       themeToUse = urlTheme;
@@ -101,7 +103,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
       // No game in URL, use localStorage theme
       themeToUse = localStorage.getItem('znr-theme') || 'default';
     }
-    
+
     setCurrentTheme(themeToUse);
     applyTheme(themeToUse);
   }, []);
@@ -109,15 +111,15 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   const applyTheme = (themeId: string) => {
     // Remove all theme attributes first
     document.documentElement.removeAttribute('data-theme');
-    
+
     // Apply new theme if not default
     if (themeId !== 'default') {
       document.documentElement.setAttribute('data-theme', themeId);
     }
-    
+
     // Save to localStorage
     localStorage.setItem('znr-theme', themeId);
-    
+
     // Force a repaint to ensure CSS changes are applied
     document.documentElement.style.display = 'none';
     document.documentElement.offsetHeight; // Trigger reflow
@@ -127,7 +129,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   const changeTheme = (themeId: string) => {
     setCurrentTheme(themeId);
     applyTheme(themeId);
-    
+
     // Update theme in URL if game is active
     updateThemeInURL(themeId);
   };
@@ -188,11 +190,10 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
           <div className="flex border-b border-znr-border">
             <button
               onClick={() => setActiveTab('about')}
-              className={`flex-1 px-4 py-3 text-sm font-medium transition-colors relative ${
-                activeTab === 'about'
+              className={`flex-1 px-4 py-3 text-sm font-medium transition-colors relative ${activeTab === 'about'
                   ? 'text-znr-text bg-znr-tertiary'
                   : 'text-znr-text-muted hover:text-znr-accent hover:bg-znr-tertiary/50'
-              }`}
+                }`}
             >
               <div className="flex items-center justify-center gap-2">
                 <Info size={14} />
@@ -204,11 +205,10 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             </button>
             <button
               onClick={() => setActiveTab('settings')}
-              className={`flex-1 px-4 py-3 text-sm font-medium transition-colors relative ${
-                activeTab === 'settings'
+              className={`flex-1 px-4 py-3 text-sm font-medium transition-colors relative ${activeTab === 'settings'
                   ? 'text-znr-text bg-znr-tertiary'
                   : 'text-znr-text-muted hover:text-znr-accent hover:bg-znr-tertiary/50'
-              }`}
+                }`}
             >
               <div className="flex items-center justify-center gap-2">
                 <Settings size={14} />
@@ -221,11 +221,10 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             {hasActiveGame && (
               <button
                 onClick={() => setActiveTab('game')}
-                className={`flex-1 px-4 py-3 text-sm font-medium transition-colors relative ${
-                  activeTab === 'game'
+                className={`flex-1 px-4 py-3 text-sm font-medium transition-colors relative ${activeTab === 'game'
                     ? 'text-znr-text bg-znr-tertiary'
                     : 'text-znr-text-muted hover:text-znr-accent hover:bg-znr-tertiary/50'
-                }`}
+                  }`}
               >
                 <div className="flex items-center justify-center gap-2">
                   <RotateCcw size={14} />
@@ -248,7 +247,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                     <span className="text-2xl">🏰</span>
                   </div>
                   <p className="text-sm text-znr-text-muted leading-relaxed">
-                    A simple score tracking app for the board game Carcassonne. 
+                    A simple score tracking app for the board game Carcassonne.
                     Track multiple players, edit scores, and enjoy!
                   </p>
                 </div>
@@ -278,14 +277,14 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                 {/* Links */}
                 <div className="pt-4 border-t border-znr-border">
                   <div className="flex gap-2">
-                    <button 
+                    <button
                       onClick={() => window.open('https://github.com/jekrch/zonr', '_blank')}
                       className="flex-1 bg-znr-tertiary hover:bg-znr-elevated rounded-lg px-3 py-2 text-sm text-znr-text transition-colors flex items-center justify-center gap-2"
                     >
                       <Github size={14} />
                       View Source
                     </button>
-                    <button 
+                    <button
                       onClick={() => window.open('https://jacobkrch.com', '_blank')}
                       className="flex-1 bg-znr-tertiary hover:bg-znr-elevated rounded-lg px-3 py-2 text-sm text-znr-text transition-colors flex items-center justify-center gap-2"
                     >
@@ -310,13 +309,12 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                       <button
                         key={theme.id}
                         onClick={() => changeTheme(theme.id)}
-                        className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all ${
-                          currentTheme === theme.id 
-                            ? 'bg-znr-elevated border border-znr-accent shadow-sm' 
+                        className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all ${currentTheme === theme.id
+                            ? 'bg-znr-elevated border border-znr-accent shadow-sm'
                             : 'bg-znr-tertiary hover:bg-znr-elevated border border-transparent'
-                        }`}
+                          }`}
                       >
-                        <div 
+                        <div
                           className="w-6 h-6 rounded-lg shadow-inner border border-white/20"
                           style={{ backgroundColor: theme.preview }}
                         />
@@ -377,7 +375,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                         </div>
                       </div>
                     </button>
-                    
+
                     <button
                       onClick={handleNewGame}
                       className="w-full flex items-center gap-3 p-3 bg-znr-tertiary hover:bg-znr-elevated rounded-xl text-left transition-colors"
@@ -427,20 +425,20 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
         isOpen={confirmDialog.isOpen}
         title={
           confirmDialog.type === 'restart' ? 'Restart Game?' :
-          confirmDialog.type === 'new' ? 'Start New Game?' :
-          'End Game?'
+            confirmDialog.type === 'new' ? 'Start New Game?' :
+              'End Game?'
         }
         message={
-          confirmDialog.type === 'restart' 
+          confirmDialog.type === 'restart'
             ? 'This will reset all scores to zero but keep the current players. This action cannot be undone.'
             : confirmDialog.type === 'new'
-            ? 'This will end the current game and return to player setup. All progress will be lost.'
-            : 'This will show the final game results and celebration. You can return to the game afterwards.'
+              ? 'This will end the current game and return to player setup. All progress will be lost.'
+              : 'This will show the final game results and celebration. You can return to the game afterwards.'
         }
         confirmText={
           confirmDialog.type === 'restart' ? 'Restart' :
-          confirmDialog.type === 'new' ? 'New Game' :
-          'Show Results'
+            confirmDialog.type === 'new' ? 'New Game' :
+              'Show Results'
         }
         onConfirm={confirmAction}
         onCancel={cancelAction}
@@ -468,13 +466,13 @@ export const SettingsButton: React.FC<{
           <Settings size={18} />
         </button>
       </div>
-      
-      <SettingsModal 
-        isOpen={isModalOpen} 
+
+      <SettingsModal
+        isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onRestartGame={onRestartGame}
         onNewGame={onNewGame}
-        onEndGame={onEndGame} // Pass through the new prop
+        onEndGame={onEndGame} 
       />
     </>
   );

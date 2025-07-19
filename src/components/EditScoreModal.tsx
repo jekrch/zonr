@@ -116,12 +116,12 @@ export const EditScoreModal: React.FC<EditScoreModalProps> = ({ isOpen, onClose,
                 </div>
                 <div className="flex items-center gap-1">
                   {/* -5 Button */}
-                  <button
+                  {/* <button
                     {...handlers.decrement5}
                     className="w-6 h-6 md:w-7 md:h-7 bg-znr-elevated rounded-lg flex items-center justify-center text-znr-text-dim hover:bg-znr-hover text-xs"
                   >
                     -5
-                  </button>
+                  </button> */}
                   {/* -1 Button */}
                   <button
                     {...handlers.decrement}
@@ -141,12 +141,12 @@ export const EditScoreModal: React.FC<EditScoreModalProps> = ({ isOpen, onClose,
                     <Plus size={16} />
                   </button>
                   {/* +5 Button */}
-                  <button
+                  {/* <button
                     {...handlers.increment5}
                     className="w-6 h-6 md:w-7 md:h-7 bg-znr-elevated rounded-lg flex items-center justify-center text-znr-text-dim hover:bg-znr-hover text-xs"
                   >
                     +5
-                  </button>
+                  </button> */}
                 </div>
               </div>
             );

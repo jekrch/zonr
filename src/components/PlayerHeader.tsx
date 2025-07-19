@@ -18,7 +18,7 @@ export const PlayerHeader = React.forwardRef<HTMLDivElement, PlayerHeaderProps>(
       ref={ref}
       className="absolute top-8 left-6 right-6 bg-znr-primary border-b border-znr-border-soft p-2 md:p-4 shadow-lg z-[60] rounded-lg"
     >
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:flex justify-center gap-1 sm:gap-2 lg:gap-3 max-w-4xl mx-auto">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:flex justify-center gap-3 sm:gap-2 lg:gap-3 max-w-4xl mx-auto">
         {players.map((player, index) => (
           <AnimatedPlayerScore
             key={player.id}

@@ -15,9 +15,9 @@ export const ScoreInputCategory: React.FC<ScoreInputCategoryProps> = ({
   onUpdateScore
 }) => {
   const increment = useHoldButton(() => onUpdateScore(category.key, 1));
-  const increment5 = useHoldButton(() => onUpdateScore(category.key, 5));
+  //const increment5 = useHoldButton(() => onUpdateScore(category.key, 5));
   const decrement = useHoldButton(() => onUpdateScore(category.key, -1));
-  const decrement5 = useHoldButton(() => onUpdateScore(category.key, -5));
+  //const decrement5 = useHoldButton(() => onUpdateScore(category.key, -5));
 
   return (
     <div className="flex items-center justify-between mb-3 md:mb-4 p-2 md:p-3 bg-znr-tertiary rounded-lg md:rounded-xl hover:bg-znr-elevated transition-colors last:mb-0">
@@ -32,12 +32,12 @@ export const ScoreInputCategory: React.FC<ScoreInputCategoryProps> = ({
       
       <div className="flex items-center gap-1">
         {/* -5 Button */}
-        <button
+        {/* <button
           {...decrement5}
           className="w-7 h-7 md:w-8 md:h-8 bg-znr-elevated rounded-md flex items-center justify-center text-znr-text-dim hover:bg-znr-hover transition-all active:scale-95 touch-manipulation text-xs"
         >
           -5
-        </button>
+        </button> */}
         
         {/* -1 Button */}
         <button
@@ -61,12 +61,12 @@ export const ScoreInputCategory: React.FC<ScoreInputCategoryProps> = ({
         </button>
         
         {/* +5 Button */}
-        <button
+        {/* <button
           {...increment5}
           className="w-7 h-7 md:w-8 md:h-8 bg-znr-elevated rounded-md flex items-center justify-center text-znr-text-dim hover:bg-znr-hover transition-all active:scale-95 touch-manipulation text-xs"
         >
           +5
-        </button>
+        </button> */}
       </div>
     </div>
   );

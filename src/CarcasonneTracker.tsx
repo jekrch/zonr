@@ -92,7 +92,7 @@ const CarcassonneTracker: React.FC = () => {
   }
 
   return (
-    <>
+    <div className="select-none">
       <SettingsButton 
         onRestartGame={restartGame}
         onNewGame={startNewGame}
@@ -129,7 +129,7 @@ const CarcassonneTracker: React.FC = () => {
         }}
         gameState={gameState}
       />
-    </>
+    </div>
   );
 };
 
