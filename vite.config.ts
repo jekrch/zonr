@@ -12,7 +12,7 @@ export default defineConfig({
       '@': '/src'
     }
   },
-  base: process.env.NODE_ENV === 'production' ? '/jekrch/' : '/',
+  base: process.env.NODE_ENV === 'production' ? '/zonr/' : '/',
   build: {
     outDir: 'dist',
     sourcemap: true
