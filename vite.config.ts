@@ -11,5 +11,10 @@ export default defineConfig({
     alias: {
       '@': '/src'
     }
+  },
+  base: process.env.NODE_ENV === 'production' ? '/jekrch/' : '/',
+  build: {
+    outDir: 'dist',
+    sourcemap: true
   }
 });
