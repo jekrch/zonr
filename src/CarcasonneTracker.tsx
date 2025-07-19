@@ -105,6 +105,9 @@ const CarcassonneTracker: React.FC = () => {
         onSelectPlayer={selectPlayer}
         onEditScore={handleEditScore}
         getCurrentTotal={getCurrentTotal}
+        onRestartGame={restartGame}
+        onNewGame={startNewGame}
+        onEndGame={handleEndGame}
       />
       <EditScoreModal
         isOpen={editingEntry !== null}

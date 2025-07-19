@@ -97,26 +97,45 @@ export const EndGameModal: React.FC<EndGameModalProps> = ({
     }
   }, [isOpen]);
 
-  const handleShare = async () => {
-    const url = `${window.location.origin}${window.location.pathname}?game=${new URLSearchParams(window.location.search).get('game')}&endGame=true`;
+const handleShare = async () => {
+    // Get the current URL parameters
+    const currentUrl = new URL(window.location.href);
+    
+    // Set the endGame parameter to true
+    currentUrl.searchParams.set('endGame', 'true');
+    
+    // If there's no game parameter but we have a gameState, we need to encode it
+    if (!currentUrl.searchParams.has('game') && gameState.players.length > 0) {
+      // Encode the current game state
+      const gameStateData = {
+        players: gameState.players,
+        activePlayer: gameState.activePlayer,
+        currentScores: gameState.currentScores,
+        turn: gameState.turn
+      };
+      const encodedGameState = btoa(JSON.stringify(gameStateData));
+      currentUrl.searchParams.set('game', encodedGameState);
+    }
+    
+    const shareUrl = currentUrl.toString();
     
     if (navigator.share) {
       try {
         await navigator.share({
           title: 'Carcassonne Game Results',
           text: `${winner.name} won with ${winner.totalScore} points!`,
-          url: url
+          url: shareUrl
         });
       } catch (err) {
         try {
-          await navigator.clipboard.writeText(url);
+          await navigator.clipboard.writeText(shareUrl);
         } catch (clipErr) {
           console.log('Share and clipboard both failed');
         }
       }
     } else {
       try {
-        await navigator.clipboard.writeText(url);
+        await navigator.clipboard.writeText(shareUrl);
       } catch (clipErr) {
         console.log('Clipboard failed');
       }

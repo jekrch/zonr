@@ -5,6 +5,7 @@ import { ScoreInputSection } from './ScoreInputSection';
 import { ScoreHistorySection } from './ScoreHistorySection';
 import { useDimensions } from '../hooks/useDimensions';
 import type { GameState, ScoreCategories, ScoreEntry } from '../types';
+import { GameOptionsSection } from './GameOptionsSection';
 
 interface GameLayoutProps {
   gameState: GameState;
@@ -13,6 +14,9 @@ interface GameLayoutProps {
   onSelectPlayer: (playerIndex: number) => void;
   onEditScore: (entry: ScoreEntry) => void;
   getCurrentTotal: () => number;
+  onRestartGame: () => void;
+  onNewGame: () => void;
+  onEndGame: () => void;
 }
 
 export const GameLayout: React.FC<GameLayoutProps> = ({
@@ -21,7 +25,10 @@ export const GameLayout: React.FC<GameLayoutProps> = ({
   onAddScore,
   onSelectPlayer,
   onEditScore,
-  getCurrentTotal
+  getCurrentTotal,
+  onRestartGame,    
+  onNewGame,       
+  onEndGame        
 }) => {
   const headerRef = useRef<HTMLDivElement>(null);
   const { headerHeight } = useDimensions(gameState.players.length, headerRef as React.RefObject<HTMLDivElement>);
@@ -55,6 +62,12 @@ export const GameLayout: React.FC<GameLayoutProps> = ({
             <ScoreHistorySection
               player={gameState.players[gameState.activePlayer]}
               onEditScore={onEditScore}
+            />
+
+            <GameOptionsSection
+              onRestartGame={onRestartGame}
+              onNewGame={onNewGame}
+              onEndGame={onEndGame}
             />
           </div>
         </div>
