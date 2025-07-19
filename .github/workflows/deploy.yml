@@ -1,10 +1,12 @@
 name: Deploy to GitHub Pages
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+  # Optionally, you can still keep automatic deployment on push to main
+  # Uncomment the lines below if you want both manual and automatic deployment
+  # push:
+  #   branches: [ main ]
 
 # Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
 concurrency:
@@ -45,7 +47,6 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     needs: build
-    if: github.ref == 'refs/heads/main'
     
     permissions:
       pages: write
