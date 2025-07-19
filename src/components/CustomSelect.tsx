@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ChevronDown } from 'lucide-react';
 
 interface DropdownOption {
   value: string;
@@ -16,7 +15,6 @@ interface CustomSelectProps {
 }
 
 export const CustomSelect: React.FC<CustomSelectProps> = ({
-  value,
   onValueChange,
   options,
   trigger,

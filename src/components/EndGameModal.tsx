@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Trophy, Target, TrendingUp, Users, Clock, Share2, ArrowLeft, RotateCcw, Plus } from 'lucide-react';
 import { Meeple } from './Meeple';
-import type { GameState, Player, ScoreEntry } from '../types';
+import type { GameState } from '../types';
 
 interface EndGameModalProps {
   isOpen: boolean;

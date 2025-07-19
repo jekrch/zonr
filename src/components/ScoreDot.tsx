@@ -8,7 +8,6 @@ export interface ScoreDotProps {
 
 export const ScoreDot: React.FC<ScoreDotProps> = ({ player, position }) => {
   const laps = Math.floor(player.totalScore / 100);
-  const currentScore = player.totalScore % 100;
   
   return (
     <div 
