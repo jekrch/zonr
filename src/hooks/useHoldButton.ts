@@ -1,6 +1,6 @@
 import { useRef, useCallback } from 'react';
 
-export const useHoldButton = (callback: () => void, initialDelay = 400, repeatDelay = 200) => {
+export const useHoldButton = (callback: () => void, initialDelay = 1000, repeatDelay = 100) => {
   const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const intervalRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
