@@ -1,0 +1,284 @@
+@import "tailwindcss";
+ 
+/* =============================================================================
+   znr THEME SYSTEM - Direct CSS Approach
+   ============================================================================= */
+
+/* Base Theme Variables */
+:root {
+  /* Default znr Theme */
+  --znr-primary: #0a0907;
+  --znr-secondary: #1a1511;
+  --znr-tertiary: #252018;
+  --znr-elevated: #3d342a;
+  --znr-hover: #4d4236;
+  
+  --znr-text: #f4e8d0;
+  --znr-text-dim: #c4b5a0;
+  --znr-text-muted: #8b775a;
+  --znr-text-accent: #d4a574;
+  --znr-text-dark: #0a0907;
+  
+  --znr-accent: #d4a574;
+  --znr-accent-alt: #a67c52;
+  
+  --znr-border: #3d342a;
+  --znr-border-soft: rgba(61, 52, 42, 0.3);
+  --znr-border-accent: rgba(212, 165, 116, 0.3);
+}
+
+/* Forest Theme */
+[data-theme="forest"] {
+  --znr-primary: #0d1117;
+  --znr-secondary: #161b22;
+  --znr-tertiary: #21262d;
+  --znr-elevated: #30363d;
+  --znr-hover: #424a53;
+  
+  --znr-text: #e6edf3;
+  --znr-text-dim: #b1bac4;
+  --znr-text-muted: #7d8590;
+  --znr-text-accent: #7fb069;
+  --znr-text-dark: #0d1117;
+  
+  --znr-accent: #7fb069;
+  --znr-accent-alt: #588157;
+  
+  --znr-border: #30363d;
+  --znr-border-soft: rgba(48, 54, 61, 0.3);
+  --znr-border-accent: rgba(127, 176, 105, 0.3);
+}
+
+/* Royal Theme */
+[data-theme="royal"] {
+  --znr-primary: #0f0f23;
+  --znr-secondary: #1a1a2e;
+  --znr-tertiary: #26264a;
+  --znr-elevated: #3d3d66;
+  --znr-hover: #4f4f7a;
+  
+  --znr-text: #e8e8ff;
+  --znr-text-dim: #c4c4d9;
+  --znr-text-muted: #8a8ab3;
+  --znr-text-accent: #6c63ff;
+  --znr-text-dark: #0f0f23;
+  
+  --znr-accent: #6c63ff;
+  --znr-accent-alt: #5753d9;
+  
+  --znr-border: #3d3d66;
+  --znr-border-soft: rgba(61, 61, 102, 0.3);
+  --znr-border-accent: rgba(108, 99, 255, 0.3);
+}
+
+/* Sunset Theme */
+[data-theme="sunset"] {
+  --znr-primary: #1a0f0a;
+  --znr-secondary: #2d1810;
+  --znr-tertiary: #402318;
+  --znr-elevated: #5c3426;
+  --znr-hover: #734034;
+  
+  --znr-text: #fff2e6;
+  --znr-text-dim: #e6ccb3;
+  --znr-text-muted: #bf9973;
+  --znr-text-accent: #ff8c42;
+  --znr-text-dark: #1a0f0a;
+  
+  --znr-accent: #ff8c42;
+  --znr-accent-alt: #7d411e;
+  
+  --znr-border: #5c3426;
+  --znr-border-soft: rgba(92, 52, 38, 0.3);
+  --znr-border-accent: rgba(255, 140, 66, 0.3);
+}
+
+/* Direct CSS Overrides for Theme Classes */
+.bg-znr-primary { background-color: var(--znr-primary) !important; }
+.bg-znr-secondary { background-color: var(--znr-secondary) !important; }
+.bg-znr-tertiary { background-color: var(--znr-tertiary) !important; }
+.bg-znr-elevated { background-color: var(--znr-elevated) !important; }
+.bg-znr-hover:hover { background-color: var(--znr-hover) !important; }
+.bg-znr-accent-alt { background-color: var(--znr-accent-alt) !important; }
+
+.text-znr-text { color: var(--znr-text) !important; }
+.text-znr-text-dim { color: var(--znr-text-dim) !important; }
+.text-znr-text-muted { color: var(--znr-text-muted) !important; }
+.text-znr-text-accent { color: var(--znr-text-accent) !important; }
+.text-znr-text-dark { color: var(--znr-text-dark) !important; }
+
+.border-znr-border { border-color: var(--znr-border) !important; }
+.border-znr-border-soft { border-color: var(--znr-border-soft) !important; }
+.border-t-znr-border-soft { border-top-color: var(--znr-border-soft) !important; }
+
+/* Score Track Markers */
+.w-1\.5.h-1\.5.bg-znr-text { 
+  background-color: var(--znr-text) !important; 
+}
+.w-0\.5.h-0\.5.bg-znr-text-muted { 
+  background-color: var(--znr-text-muted) !important; 
+}
+
+/* Gradient Classes */
+.bg-gradient-to-r.from-znr-accent-alt.to-znr-accent {
+  background: linear-gradient(to right, var(--znr-accent-alt), var(--znr-accent)) !important;
+}
+
+.bg-gradient-to-br.from-znr-secondary.to-znr-tertiary {
+  background: linear-gradient(to bottom right, var(--znr-secondary), var(--znr-tertiary)) !important;
+}
+
+/* Special Gradient for Score Track Lines */
+.bg-gradient-to-r.from-transparent.via-znr-hover.to-transparent {
+  background: linear-gradient(to right, transparent, var(--znr-hover), transparent) !important;
+}
+
+/* Ring and Shadow Classes */
+.ring-znr-accent { --tw-ring-color: var(--znr-accent) !important; }
+.shadow-\[0_0_0_2px_var\(--color-znr-border-accent\)\] {
+  box-shadow: 0 0 0 2px var(--znr-border-accent) !important;
+}
+
+/* Border Accent Classes */
+.border-t-znr-accent {
+  border-top-color: var(--znr-accent) !important;
+}
+
+/* Focus States */
+.focus\:border-znr-accent:focus {
+  border-color: var(--znr-accent) !important;
+}
+
+/* Placeholder Colors */
+.placeholder-znr-text-muted::placeholder {
+  color: var(--znr-text-muted) !important;
+}
+
+/* Modern Luxurious Scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--znr-elevated) var(--znr-secondary);
+}
+
+*::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--znr-secondary);
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    135deg,
+    var(--znr-elevated) 0%,
+    var(--znr-hover) 50%,
+    var(--znr-elevated) 100%
+  );
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+  transition: all 0.3s ease;
+  box-shadow: 
+    inset 0 1px 0 rgba(244, 232, 208, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    135deg,
+    var(--znr-accent-alt) 0%,
+    var(--znr-accent) 50%,
+    var(--znr-accent-alt) 100%
+  );
+  box-shadow: 
+    inset 0 1px 0 rgba(244, 232, 208, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+    0 2px 8px var(--znr-border-accent);
+}
+
+*::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(
+    135deg,
+    var(--znr-accent) 0%,
+    var(--znr-accent-alt) 50%,
+    var(--znr-accent) 100%
+  );
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.3),
+    0 1px 4px var(--znr-border-accent);
+}
+
+*::-webkit-scrollbar-corner {
+  background: var(--znr-secondary);
+}
+
+/* Enhanced scrollbars for specific containers */
+.znr-scroll-enhanced::-webkit-scrollbar {
+  width: 14px;
+}
+
+.znr-scroll-enhanced::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    135deg,
+    var(--znr-accent-alt) 0%,
+    var(--znr-accent) 50%,
+    var(--znr-accent-alt) 100%
+  );
+  border: 1px solid rgba(244, 232, 208, 0.1);
+  box-shadow: 
+    inset 0 1px 0 rgba(244, 232, 208, 0.15),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.25),
+    0 2px 12px var(--znr-border-accent);
+}
+
+.znr-scroll-enhanced::-webkit-scrollbar-thumb:hover {
+  box-shadow: 
+    inset 0 1px 0 rgba(244, 232, 208, 0.25),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+    0 4px 16px var(--znr-border-accent);
+  transform: scale(1.02);
+}
+
+/* Theme Selection Utility */
+.theme-selector {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 100;
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  background: var(--znr-secondary);
+  border: 1px solid var(--znr-border);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.theme-selector button {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.theme-selector button:hover {
+  transform: scale(1.1);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.theme-selector button.active {
+  border-color: var(--znr-accent);
+  box-shadow: 0 0 0 2px var(--znr-border-accent);
+}
+
+.theme-default { background: linear-gradient(135deg, #d4a574, #a67c52); }
+.theme-forest { background: linear-gradient(135deg, #7fb069, #588157); }
+.theme-royal { background: linear-gradient(135deg, #6c63ff, #5753d9); }
+.theme-sunset { background: linear-gradient(135deg, #ff8c42, #e67332); }
