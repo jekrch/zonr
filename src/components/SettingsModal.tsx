@@ -1,6 +1,5 @@
-// components/SettingsModal.tsx
 import React, { useState, useEffect } from 'react';
-import { Settings, X, Palette, Info, Github, ExternalLink, RotateCcw, Plus, AlertTriangle } from 'lucide-react';
+import { Settings, X, Palette, Info, Github, ExternalLink, RotateCcw, Plus, AlertTriangle, Trophy } from 'lucide-react';
 import { updateThemeInURL, clearGameFromURL, loadGameStateFromURL } from '../gameStateUtils';
 
 interface SettingsModalProps {
@@ -8,6 +7,7 @@ interface SettingsModalProps {
   onClose: () => void;
   onRestartGame?: () => void;
   onNewGame?: () => void;
+  onEndGame?: () => void; // New prop for end game
 }
 
 interface ConfirmDialogProps {
@@ -68,12 +68,18 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   );
 };
 
-const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onRestartGame, onNewGame }) => {
+const SettingsModal: React.FC<SettingsModalProps> = ({ 
+  isOpen, 
+  onClose, 
+  onRestartGame, 
+  onNewGame,
+  onEndGame // New prop
+}) => {
   const [activeTab, setActiveTab] = useState<'about' | 'settings' | 'game'>('about');
   const [currentTheme, setCurrentTheme] = useState('default');
   const [confirmDialog, setConfirmDialog] = useState<{
     isOpen: boolean;
-    type: 'restart' | 'new' | null;
+    type: 'restart' | 'new' | 'end' | null;
   }>({ isOpen: false, type: null });
 
   const themes = [
@@ -134,12 +140,18 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onRestar
     setConfirmDialog({ isOpen: true, type: 'new' });
   };
 
+  const handleEndGame = () => {
+    setConfirmDialog({ isOpen: true, type: 'end' });
+  };
+
   const confirmAction = () => {
     if (confirmDialog.type === 'restart' && onRestartGame) {
       onRestartGame();
     } else if (confirmDialog.type === 'new' && onNewGame) {
       clearGameFromURL();
       onNewGame();
+    } else if (confirmDialog.type === 'end' && onEndGame) {
+      onEndGame();
     }
     setConfirmDialog({ isOpen: false, type: null });
     onClose();
@@ -335,6 +347,22 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onRestar
                 <div className="space-y-3">
                   <h4 className="text-sm font-semibold text-znr-text uppercase tracking-wide">Game Actions</h4>
                   <div className="space-y-2">
+                    {/* NEW: End Game Button */}
+                    <button
+                      onClick={handleEndGame}
+                      className="w-full flex items-center gap-3 p-3 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 hover:from-yellow-500/30 hover:to-orange-500/30 border border-yellow-500/30 rounded-xl text-left transition-all"
+                    >
+                      <div className="w-8 h-8 bg-yellow-500/30 rounded-lg flex items-center justify-center">
+                        <Trophy size={16} className="text-yellow-400" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="text-sm font-medium text-znr-text">End Game</div>
+                        <div className="text-xs text-znr-text-muted">
+                          Show final results and celebration
+                        </div>
+                      </div>
+                    </button>
+
                     <button
                       onClick={handleRestartGame}
                       className="w-full flex items-center gap-3 p-3 bg-znr-tertiary hover:bg-znr-elevated rounded-xl text-left transition-colors"
@@ -397,16 +425,26 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onRestar
 
       <ConfirmDialog
         isOpen={confirmDialog.isOpen}
-        title={confirmDialog.type === 'restart' ? 'Restart Game?' : 'Start New Game?'}
+        title={
+          confirmDialog.type === 'restart' ? 'Restart Game?' :
+          confirmDialog.type === 'new' ? 'Start New Game?' :
+          'End Game?'
+        }
         message={
           confirmDialog.type === 'restart' 
             ? 'This will reset all scores to zero but keep the current players. This action cannot be undone.'
-            : 'This will end the current game and return to player setup. All progress will be lost.'
+            : confirmDialog.type === 'new'
+            ? 'This will end the current game and return to player setup. All progress will be lost.'
+            : 'This will show the final game results and celebration. You can return to the game afterwards.'
         }
-        confirmText={confirmDialog.type === 'restart' ? 'Restart' : 'New Game'}
+        confirmText={
+          confirmDialog.type === 'restart' ? 'Restart' :
+          confirmDialog.type === 'new' ? 'New Game' :
+          'Show Results'
+        }
         onConfirm={confirmAction}
         onCancel={cancelAction}
-        danger={true}
+        danger={confirmDialog.type !== 'end'}
       />
     </>
   );
@@ -416,7 +454,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onRestar
 export const SettingsButton: React.FC<{
   onRestartGame?: () => void;
   onNewGame?: () => void;
-}> = ({ onRestartGame, onNewGame }) => {
+  onEndGame?: () => void; // New prop
+}> = ({ onRestartGame, onNewGame, onEndGame }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
@@ -435,6 +474,7 @@ export const SettingsButton: React.FC<{
         onClose={() => setIsModalOpen(false)}
         onRestartGame={onRestartGame}
         onNewGame={onNewGame}
+        onEndGame={onEndGame} // Pass through the new prop
       />
     </>
   );

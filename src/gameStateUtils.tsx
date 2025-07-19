@@ -173,14 +173,22 @@ export const decodeGameState = (encoded: string): { gameState: GameState | null;
  * 
  * @param gameState The game state to encode in the URL
  * @param theme The current theme to encode in the URL
+ * @param endGame Whether to include the endGame parameter
  */
-export const updateURL = (gameState: GameState, theme?: string): void => {
+export const updateURL = (gameState: GameState, theme?: string, endGame?: boolean): void => {
   // Get current theme from localStorage if not provided
   const currentTheme = theme || localStorage.getItem('znr-theme') || 'default';
   
   const encoded = encodeGameState(gameState, currentTheme);
   const url = new URL(window.location.href);
   url.searchParams.set('game', encoded);
+  
+  if (endGame) {
+    url.searchParams.set('endGame', 'true');
+  } else {
+    url.searchParams.delete('endGame');
+  }
+  
   window.history.pushState({}, '', url.toString());
 };
 
@@ -192,11 +200,12 @@ export const updateURL = (gameState: GameState, theme?: string): void => {
 export const updateThemeInURL = (theme: string): void => {
   const urlParams = new URLSearchParams(window.location.search);
   const gameData = urlParams.get('game');
+  const endGame = urlParams.get('endGame') === 'true';
   
   if (gameData) {
     const { gameState } = decodeGameState(gameData);
     if (gameState) {
-      updateURL(gameState, theme);
+      updateURL(gameState, theme, endGame);
     }
   }
 };
@@ -204,17 +213,19 @@ export const updateThemeInURL = (theme: string): void => {
 /**
  * Loads game state and theme from the current URL parameters
  * 
- * @returns Object with decoded GameState (or null) and theme
+ * @returns Object with decoded GameState (or null), theme, and endGame flag
  */
-export const loadGameStateFromURL = (): { gameState: GameState | null; theme: string } => {
+export const loadGameStateFromURL = (): { gameState: GameState | null; theme: string; endGame: boolean } => {
   const urlParams = new URLSearchParams(window.location.search);
   const gameData = urlParams.get('game');
+  const endGame = urlParams.get('endGame') === 'true';
   
   if (gameData) {
-    return decodeGameState(gameData);
+    const { gameState, theme } = decodeGameState(gameData);
+    return { gameState, theme, endGame };
   }
   
-  return { gameState: null, theme: 'default' };
+  return { gameState: null, theme: 'default', endGame: false };
 };
 
 /**
@@ -223,5 +234,21 @@ export const loadGameStateFromURL = (): { gameState: GameState | null; theme: st
 export const clearGameFromURL = (): void => {
   const url = new URL(window.location.href);
   url.searchParams.delete('game');
+  url.searchParams.delete('endGame');
+  window.history.pushState({}, '', url.toString());
+};
+
+/**
+ * Sets the endGame parameter in the URL
+ * 
+ * @param endGame Whether to show the end game modal
+ */
+export const setEndGameInURL = (endGame: boolean): void => {
+  const url = new URL(window.location.href);
+  if (endGame) {
+    url.searchParams.set('endGame', 'true');
+  } else {
+    url.searchParams.delete('endGame');
+  }
   window.history.pushState({}, '', url.toString());
 };
