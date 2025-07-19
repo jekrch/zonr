@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { GameState, ScoreCategories, ScoreEntry } from '../types';
-import { PLAYER_COLORS, updateURL, loadGameStateFromURL } from '../gameStateUtils';
+import { updateURL, loadGameStateFromURL, clearGameFromURL } from '../gameStateUtils';
 
 export const useGameState = () => {
   const [gameState, setGameState] = useState<GameState>({
@@ -12,22 +12,42 @@ export const useGameState = () => {
   
   const [showSetup, setShowSetup] = useState<boolean>(true);
 
-  // Load game state from URL on mount
+  // Load game state and theme from URL on mount
   useEffect(() => {
-    const loadedGameState = loadGameStateFromURL();
+    const { gameState: loadedGameState, theme } = loadGameStateFromURL();
     
     if (loadedGameState) {
       setGameState(loadedGameState);
       setShowSetup(false);
+      
+      // URL theme always takes precedence - apply it immediately
+      applyThemeFromURL(theme);
+    } else {
+      // No game in URL, use localStorage theme if available
+      const localTheme = localStorage.getItem('znr-theme') || 'default';
+      applyThemeFromURL(localTheme);
     }
   }, []);
 
-  const createGame = useCallback((playerNames: string[]): void => {
+  const applyThemeFromURL = (theme: string) => {
+    // Remove all theme attributes first
+    document.documentElement.removeAttribute('data-theme');
+    
+    // Apply theme (including 'default' which removes the attribute)
+    if (theme !== 'default') {
+      document.documentElement.setAttribute('data-theme', theme);
+    }
+    
+    // Save to localStorage for future sessions
+    localStorage.setItem('znr-theme', theme);
+  };
+
+  const createGame = useCallback((players: { name: string; color: string }[]): void => {
     const newGameState: GameState = {
-      players: playerNames.map((name, index) => ({
+      players: players.map((player, index) => ({
         id: index,
-        name,
-        color: PLAYER_COLORS[index],
+        name: player.name,
+        color: player.color,
         totalScore: 0,
         history: []
       })),
@@ -37,7 +57,39 @@ export const useGameState = () => {
     };
     
     setGameState(newGameState);
+    setShowSetup(false);
     updateURL(newGameState);
+  }, []);
+
+  const restartGame = useCallback((): void => {
+    setGameState(prev => {
+      const restartedGameState: GameState = {
+        players: prev.players.map((player, index) => ({
+          id: index,
+          name: player.name,
+          color: player.color, // Preserve the chosen color
+          totalScore: 0,
+          history: []
+        })),
+        activePlayer: 0,
+        currentScores: { roads: 0, cities: 0, monasteries: 0, fields: 0 },
+        turn: 1
+      };
+      
+      updateURL(restartedGameState);
+      return restartedGameState;
+    });
+  }, []);
+
+  const startNewGame = useCallback((): void => {
+    setGameState({
+      players: [],
+      activePlayer: 0,
+      currentScores: { roads: 0, cities: 0, monasteries: 0, fields: 0 },
+      turn: 1
+    });
+    setShowSetup(true);
+    clearGameFromURL();
   }, []);
 
   // Memoize this function to prevent useHoldButton from resetting
@@ -115,6 +167,8 @@ export const useGameState = () => {
     showSetup,
     setShowSetup,
     createGame,
+    restartGame,
+    startNewGame,
     updateCurrentScore,
     getCurrentTotal,
     addScore,

@@ -16,7 +16,9 @@ const CarcassonneTracker: React.FC = () => {
     getCurrentTotal,
     addScore,
     selectPlayer,
-    saveEditedScore
+    saveEditedScore,
+    restartGame, 
+    startNewGame
   } = useGameState();
 
   const [editingEntry, setEditingEntry] = useState<ScoreEntry | null>(null);
@@ -30,14 +32,21 @@ const CarcassonneTracker: React.FC = () => {
     setEditingEntry(null);
   };
 
+  const handleCreateGame = (players: { name: string; color: string }[]): void => {
+    createGame(players);
+  };
+
   if (showSetup) {
     return (
       <div className="min-h-screen bg-znr-primary flex items-center justify-center">
-        <SettingsButton />
+        <SettingsButton 
+          onRestartGame={restartGame}
+          onNewGame={startNewGame}
+        />
         <GameSetupModal
           isOpen={showSetup}
           onClose={() => setShowSetup(false)}
-          onCreateGame={createGame}
+          onCreateGame={handleCreateGame}
         />
       </div>
     );
@@ -45,7 +54,10 @@ const CarcassonneTracker: React.FC = () => {
 
   return (
     <>
-      <SettingsButton />
+      <SettingsButton 
+        onRestartGame={restartGame}
+        onNewGame={startNewGame}
+      />
       <GameLayout
         gameState={gameState}
         onUpdateScore={updateCurrentScore}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { ScoreTrackBorder } from './ScoreTrackBorder';
 import { PlayerHeader } from './PlayerHeader';
 import { ScoreInputSection } from './ScoreInputSection';
@@ -23,13 +23,15 @@ export const GameLayout: React.FC<GameLayoutProps> = ({
   onEditScore,
   getCurrentTotal
 }) => {
-  const { headerHeight } = useDimensions(gameState.players.length);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const { headerHeight } = useDimensions(gameState.players.length, headerRef as React.RefObject<HTMLDivElement>);
 
   return (
     <div className="fixed inset-0 bg-znr-elevated text-znr-text overflow-hidden">
       <ScoreTrackBorder players={gameState.players} />
       
       <PlayerHeader
+        ref={headerRef}
         players={gameState.players}
         activePlayer={gameState.activePlayer}
         onSelectPlayer={onSelectPlayer}
