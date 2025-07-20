@@ -57,12 +57,6 @@ bun run preview
 - **Package Manager**: Bun
 - **Deployment**: GitHub Pages via GitHub Actions
 
-### Key Dependencies
-
-- `lucide-react` - Icons
-- `@tsparticles/react` - Particle effects for celebrations
-- `class-variance-authority` - Component variant styling
-
 ## Usage
 
 ### Getting Started
