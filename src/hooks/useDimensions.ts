@@ -8,7 +8,7 @@ interface Dimensions {
 
 export const useDimensions = (
   playerCount?: number, 
-  headerRef?: RefObject<HTMLDivElement>
+  headerRef?: RefObject<HTMLDivElement | null>
 ): Dimensions => {
   const [headerHeight, setHeaderHeight] = useState<number>(0);
   const [windowDimensions, setWindowDimensions] = useState({ 
