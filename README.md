@@ -15,11 +15,16 @@ A clean, modern score tracking app for the board game Carcassonne. Keep track of
 - **Multiple themes** - Choose from classic, forest, royal, and sunset color schemes
 - **Mobile-optimized** - Touch-friendly controls, hold-to-repeat buttons, and responsive design
 - **End game celebration** - Fireworks animation with detailed statistics and player breakdowns
-- **Offline-ready** - Works without internet once loaded
 
 ## Screenshots
 
-The app features a border score track with player positions, a clean scoring interface for the active player, and comprehensive game statistics at the end.
+<img width="200" alt="image" src="https://github.com/user-attachments/assets/cf1fc946-4198-4f2e-9674-c0cdd5db42af" />
+
+<img width="200" alt="image" src="https://github.com/user-attachments/assets/8247e71a-b472-4184-a73f-228dd7043844" />
+
+<img width="200" alt="image" src="https://github.com/user-attachments/assets/98526bbf-6ecf-47ba-ab5b-d79df37f7b45" />
+
+<img width="200" alt="image" src="https://github.com/user-attachments/assets/e63c9eab-feda-417f-8e7c-5cf3556c52dd" />
 
 ## Development
 
