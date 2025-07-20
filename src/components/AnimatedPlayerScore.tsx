@@ -24,7 +24,7 @@ export const AnimatedPlayerScore: React.FC<AnimatedPlayerScoreProps> = ({
         transition-all duration-300 flex flex-row items-center justify-center gap-3 sm:gap-4
         shadow-lg hover:shadow-xl hover:-translate-y-0.5 relative min-h-[70px] sm:min-h-[65px] lg:min-h-[75px]
         ${isActive 
-          ? 'border-gray-400 bg-gradient-to-br from-znr-secondary to-znr-tertiary shadow-[0_0_0_2px_var(--color-znr-border-accent)]' 
+          ? 'border-znr-border-soft bg-gradient-to-br from-znr-secondary to-znr-tertiary shadow-[0_0_0_2px_var(--color-znr-border-accent)]' 
           : 'border-transparent hover:border-znr-hover'
         }
       `}
