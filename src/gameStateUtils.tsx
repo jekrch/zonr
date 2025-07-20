@@ -1,4 +1,4 @@
-import type { GameState, Player, ScoreEntry } from './types';
+import { GameState, Player, type ScoreEntry } from './types';
 
 /**
  * Standard Carcassonne meeple colors
@@ -145,21 +145,17 @@ export const decodeGameState = (encoded: string): { gameState: GameState | null;
       
       const totalScore = history.reduce((sum, entry) => sum + entry.total, 0);
       
-      return {
-        id: index,
-        name,
-        color,
-        totalScore,
-        history
-      };
+      // Create a proper Player instance instead of a plain object
+      return new Player(index, name, color, totalScore, history);
     });
     
-    const gameState: GameState = {
+    // Create a proper GameState instance instead of a plain object
+    const gameState = new GameState(
       players,
       activePlayer,
-      currentScores: { roads: 0, cities: 0, monasteries: 0, fields: 0 },
+      { roads: 0, cities: 0, monasteries: 0, fields: 0 },
       turn
-    };
+    );
 
     return { gameState, theme };
   } catch (e) {

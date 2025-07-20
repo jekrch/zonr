@@ -53,7 +53,7 @@ export const GameLayout: React.FC<GameLayoutProps> = ({
           <div className="max-w-2xl mx-auto w-full">
             <ScoreInputSection
               currentScores={gameState.currentScores}
-              activePlayerName={gameState.players[gameState.activePlayer]?.name}
+              activePlayerName={gameState.getActivePlayer()?.getPlayerName()}
               onUpdateScore={onUpdateScore}
               onAddScore={onAddScore}
               getCurrentTotal={getCurrentTotal}

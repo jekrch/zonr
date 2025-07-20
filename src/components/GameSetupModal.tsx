@@ -96,10 +96,9 @@ export const GameSetupModal: React.FC<GameSetupModalProps> = ({ isOpen, onClose,
   const handleSubmit = (): void => {
     const validPlayers = playerNames
       .map((name, index) => ({
-        name: name.trim(),
+        name: name?.trim(),
         color: playerColors[index]
-      }))
-      .filter(player => player.name);
+      }));
       
     if (validPlayers.length >= 2) {
       onCreateGame(validPlayers);
@@ -219,7 +218,7 @@ export const GameSetupModal: React.FC<GameSetupModalProps> = ({ isOpen, onClose,
           <button
             type="button"
             onClick={handleSubmit}
-            disabled={playerNames.filter(name => name.trim()).length < 2}
+            // disabled={playerNames.filter(name => name.trim()).length < 2}
             className="flex-1 py-2 md:py-3 bg-gradient-to-r from-znr-accent-alt to-znr-accent rounded-xl text-znr-text-dark font-semibold disabled:opacity-50 disabled:cursor-not-allowed text-sm md:text-base"
           >
             Start Game

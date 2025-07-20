@@ -13,19 +13,70 @@ export interface ScoreEntry {
   id: string;
 }
 
-export interface Player {
+export class Player {
   id: number;
   name: string;
   color: string;
   totalScore: number;
   history: ScoreEntry[];
+
+  constructor(
+    id: number,
+    name: string,
+    color: string,
+    totalScore: number = 0,
+    history: ScoreEntry[] = []
+  ) {
+    this.id = id;
+    this.name = name;
+    this.color = color;
+    this.totalScore = totalScore;
+    this.history = history;
+  }
+
+  /**
+   * Returns the player's name, or a generic name if one isn't provided.
+   */
+  getPlayerName(): string {
+    return this.name.length ? this.name : `Player ${this.id + 1}`;
+  }
+
+  /**
+   * Creates a new Player instance from a plain object.
+   */
+  static fromPlain(obj: Player): Player {
+    return new Player(obj.id, obj.name, obj.color, obj.totalScore, obj.history);
+  }
+  
+  /**
+   * Creates a new instance of the player, allowing for safe state updates.
+   */
+  clone(): Player {
+    return new Player(this.id, this.name, this.color, this.totalScore, [...this.history]);
+  }
 }
 
-export interface GameState {
+export class GameState {
   players: Player[];
   activePlayer: number;
   currentScores: ScoreCategories;
   turn: number;
+
+  constructor(
+    players: Player[],
+    activePlayer: number,
+    currentScores: ScoreCategories,
+    turn: number
+  ) {
+    this.players = players;
+    this.activePlayer = activePlayer;
+    this.currentScores = currentScores;
+    this.turn = turn;
+  }
+
+  getActivePlayer(): Player {
+    return this.players?.[this.activePlayer];
+  }
 }
 
 export interface ScoreCategory {
