@@ -53,7 +53,7 @@ export const GameLayout: React.FC<GameLayoutProps> = ({
   }, [headerHeight]);
 
   // Calculate safe spacing values
-  const topSpacing = Math.max(headerHeight + 40, 140); // Minimum fallback height
+  const topSpacing = Math.max(headerHeight + 40, 125); // Minimum fallback height
   const contentOpacity = isLayoutReady ? 1 : 0; // Fade in when layout is ready
 
   return (
