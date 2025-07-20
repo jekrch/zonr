@@ -3,6 +3,8 @@
 
 ![Version](https://img.shields.io/badge/version-1.1-blue) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+<a href="jekrch.github.io/zonr">jekrch.github.io/zonr/</a>
+
 A clean, modern score tracking app for the board game Carcassonne. Keep track of multiple players' scores across all scoring categories with an intuitive interface designed for both desktop and mobile play.
 
 ## Features
