@@ -20,9 +20,9 @@ A clean, modern score tracking app for the board game Carcassonne. Keep track of
 
 ## Screenshots
 
-<img width="200" alt="image" src="https://github.com/user-attachments/assets/cf1fc946-4198-4f2e-9674-c0cdd5db42af" />
+<img width="200" alt="image" src="https://github.com/user-attachments/assets/df62b2e5-fdd8-44f7-ba4d-d392e3f58d5e" />
 
-<img width="200" alt="image" src="https://github.com/user-attachments/assets/8247e71a-b472-4184-a73f-228dd7043844" />
+<img width="200" alt="image" src="https://github.com/user-attachments/assets/873d2812-cc04-4ec0-aeb0-68e0ffc36bc5" />
 
 <img width="200" alt="image" src="https://github.com/user-attachments/assets/98526bbf-6ecf-47ba-ab5b-d79df37f7b45" />
 
