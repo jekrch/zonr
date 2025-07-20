@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { ScoreTrackBorder } from './ScoreTrackBorder';
 import { PlayerHeader } from './PlayerHeader';
 import { ScoreInputSection } from './ScoreInputSection';
@@ -31,7 +31,50 @@ export const GameLayout: React.FC<GameLayoutProps> = ({
   onEndGame        
 }) => {
   const headerRef = useRef<HTMLDivElement>(null);
-  const { headerHeight } = useDimensions(gameState.players.length, headerRef as React.RefObject<HTMLDivElement>);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const { headerHeight } = useDimensions(gameState.players.length, headerRef);
+  const [isLayoutReady, setIsLayoutReady] = useState(false);
+
+  // Ensure layout is properly initialized
+  useEffect(() => {
+    const checkLayout = () => {
+      if (headerHeight > 0) {
+        setIsLayoutReady(true);
+      }
+    };
+
+    checkLayout();
+    
+    // Also check after a delay to handle initial load timing
+    const timeoutId = setTimeout(checkLayout, 200);
+    return () => clearTimeout(timeoutId);
+  }, [headerHeight]);
+
+  // Prevent scroll issues on iOS by handling touch events properly
+  useEffect(() => {
+    const preventBodyScroll = (e: TouchEvent) => {
+      // Allow scrolling within the content container
+      if (contentRef.current && contentRef.current.contains(e.target as Node)) {
+        return;
+      }
+      
+      // Prevent default scroll behavior outside content container
+      e.preventDefault();
+    };
+
+    // Add touch event listeners to prevent scroll issues
+    document.addEventListener('touchstart', preventBodyScroll, { passive: false });
+    document.addEventListener('touchmove', preventBodyScroll, { passive: false });
+
+    return () => {
+      document.removeEventListener('touchstart', preventBodyScroll);
+      document.removeEventListener('touchmove', preventBodyScroll);
+    };
+  }, []);
+
+  // Calculate safe spacing values
+  const topSpacing = Math.max(headerHeight + 40, 140); // Minimum fallback height
+  const contentOpacity = isLayoutReady ? 1 : 0; // Fade in when layout is ready
 
   return (
     <div className="fixed inset-0 bg-znr-elevated text-znr-text overflow-hidden">
@@ -44,31 +87,48 @@ export const GameLayout: React.FC<GameLayoutProps> = ({
         onSelectPlayer={onSelectPlayer}
       />
 
-      {/* Content Container */}
+      {/* Content Container with improved mobile handling */}
       <div 
-        className="absolute left-6 right-6 bottom-8 bg-znr-primary z-[40] overflow-y-auto rounded-lg znr-scroll-enhanced"
-        style={{ top: `${headerHeight + 40}px` }}
+        ref={contentRef}
+        className="absolute left-6 right-6 bottom-8 bg-znr-primary z-[40] rounded-lg znr-scroll-enhanced"
+        style={{ 
+          top: `${topSpacing}px`,
+          opacity: contentOpacity,
+          transition: 'opacity 0.2s ease-in-out',
+          overflow: 'hidden' // Changed from overflow-y-auto to be more explicit
+        }}
       >
-        <div className="p-2 md:p-4">
-          <div className="max-w-2xl mx-auto w-full">
-            <ScoreInputSection
-              currentScores={gameState.currentScores}
-              activePlayerName={gameState.getActivePlayer()?.getPlayerName()}
-              onUpdateScore={onUpdateScore}
-              onAddScore={onAddScore}
-              getCurrentTotal={getCurrentTotal}
-            />
+        <div 
+          className="h-full overflow-y-auto overscroll-contain"
+          style={{
+            WebkitOverflowScrolling: 'touch', // Better iOS scrolling
+            scrollbarWidth: 'thin'
+          }}
+        >
+          <div className="p-2 md:p-4">
+            <div className="max-w-2xl mx-auto w-full">
+              <ScoreInputSection
+                currentScores={gameState.currentScores}
+                activePlayerName={gameState.getActivePlayer()?.getPlayerName()}
+                onUpdateScore={onUpdateScore}
+                onAddScore={onAddScore}
+                getCurrentTotal={getCurrentTotal}
+              />
 
-            <ScoreHistorySection
-              player={gameState.players[gameState.activePlayer]}
-              onEditScore={onEditScore}
-            />
+              <ScoreHistorySection
+                player={gameState.players[gameState.activePlayer]}
+                onEditScore={onEditScore}
+              />
 
-            <GameOptionsSection
-              onRestartGame={onRestartGame}
-              onNewGame={onNewGame}
-              onEndGame={onEndGame}
-            />
+              <GameOptionsSection
+                onRestartGame={onRestartGame}
+                onNewGame={onNewGame}
+                onEndGame={onEndGame}
+              />
+              
+              {/* Bottom padding for iOS safe area */}
+              <div className="h-4 md:h-6" />
+            </div>
           </div>
         </div>
       </div>

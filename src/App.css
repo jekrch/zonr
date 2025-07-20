@@ -535,3 +535,60 @@
 .gentle-sway {
   animation: gentleSway 3s ease-in-out infinite;
 }
+
+
+/* Enhanced scroll behavior for iOS and mobile devices */
+.znr-scroll-enhanced {
+  /* Smooth scrolling for iOS */
+  -webkit-overflow-scrolling: touch;
+  
+  /* Prevent scroll chaining/overscroll */
+  overscroll-behavior: contain;
+  
+  /* Better scroll performance */
+  will-change: scroll-position;
+  
+  /* Prevent zoom on double tap for iOS */
+  touch-action: pan-y;
+}
+
+/* Improved scrollbar styling */
+.znr-scroll-enhanced::-webkit-scrollbar {
+  width: 4px;
+}
+
+.znr-scroll-enhanced::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.znr-scroll-enhanced::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+}
+
+.znr-scroll-enhanced::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Prevent rubber band scrolling on iOS when at scroll boundaries */
+.znr-scroll-enhanced {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Additional mobile optimizations */
+@media (max-width: 768px) {
+  .znr-scroll-enhanced {
+    /* Optimize for mobile performance */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+}
+
+/* Prevent body scrolling on mobile when modals are open */
+body.no-scroll {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
