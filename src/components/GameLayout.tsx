@@ -10,6 +10,7 @@ import { GameOptionsSection } from './GameOptionsSection';
 interface GameLayoutProps {
   gameState: GameState;
   onUpdateScore: (category: keyof ScoreCategories, delta: number) => void;
+  onSetScore: (category: keyof ScoreCategories, score: number) => void; // Add this prop
   onAddScore: () => void;
   onSelectPlayer: (playerIndex: number) => void;
   onEditScore: (entry: ScoreEntry) => void;
@@ -22,6 +23,7 @@ interface GameLayoutProps {
 export const GameLayout: React.FC<GameLayoutProps> = ({
   gameState,
   onUpdateScore,
+  onSetScore, 
   onAddScore,
   onSelectPlayer,
   onEditScore,
@@ -89,6 +91,7 @@ export const GameLayout: React.FC<GameLayoutProps> = ({
                 currentScores={gameState.currentScores}
                 activePlayerName={gameState.getActivePlayer()?.getPlayerName()}
                 onUpdateScore={onUpdateScore}
+                onSetScore={onSetScore} // Add this prop
                 onAddScore={onAddScore}
                 getCurrentTotal={getCurrentTotal}
               />

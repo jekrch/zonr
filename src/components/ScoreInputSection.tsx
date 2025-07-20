@@ -6,6 +6,7 @@ interface ScoreInputSectionProps {
   currentScores: ScoreCategories;
   activePlayerName: string;
   onUpdateScore: (category: keyof ScoreCategories, delta: number) => void;
+  onSetScore?: (category: keyof ScoreCategories, score: number) => void;
   onAddScore: () => void;
   getCurrentTotal: () => number;
 }
@@ -21,6 +22,7 @@ export const ScoreInputSection: React.FC<ScoreInputSectionProps> = ({
   currentScores,
   activePlayerName,
   onUpdateScore,
+  onSetScore,
   onAddScore,
   getCurrentTotal
 }) => {
@@ -32,6 +34,7 @@ export const ScoreInputSection: React.FC<ScoreInputSectionProps> = ({
           category={category}
           currentScore={currentScores[category.key]}
           onUpdateScore={onUpdateScore}
+          onSetScore={onSetScore}
         />
       ))}
 

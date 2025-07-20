@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Minus, X } from 'lucide-react';
-import { useHoldButton } from '../hooks/useHoldButton';
+import { X } from 'lucide-react';
+import { ScoreControl } from './ScoreControl';
 import type { ScoreCategories, ScoreEntry, ScoreCategory } from '../types';
 
 export interface EditScoreModalProps {
@@ -22,53 +22,11 @@ export const EditScoreModal: React.FC<EditScoreModalProps> = ({ isOpen, onClose,
     }));
   };
 
-  // Pre-create all hold button handlers at the top level
-  const roadsIncrement = useHoldButton(() => updateScore('roads', 1));
-  const roadsIncrement5 = useHoldButton(() => updateScore('roads', 5));
-  const roadsDecrement = useHoldButton(() => updateScore('roads', -1));
-  const roadsDecrement5 = useHoldButton(() => updateScore('roads', -5));
-
-  const citiesIncrement = useHoldButton(() => updateScore('cities', 1));
-  const citiesIncrement5 = useHoldButton(() => updateScore('cities', 5));
-  const citiesDecrement = useHoldButton(() => updateScore('cities', -1));
-  const citiesDecrement5 = useHoldButton(() => updateScore('cities', -5));
-
-  const monasteriesIncrement = useHoldButton(() => updateScore('monasteries', 1));
-  const monasteriesIncrement5 = useHoldButton(() => updateScore('monasteries', 5));
-  const monasteriesDecrement = useHoldButton(() => updateScore('monasteries', -1));
-  const monasteriesDecrement5 = useHoldButton(() => updateScore('monasteries', -5));
-
-  const fieldsIncrement = useHoldButton(() => updateScore('fields', 1));
-  const fieldsIncrement5 = useHoldButton(() => updateScore('fields', 5));
-  const fieldsDecrement = useHoldButton(() => updateScore('fields', -1));
-  const fieldsDecrement5 = useHoldButton(() => updateScore('fields', -5));
-
-  // Create a lookup object for the handlers
-  const holdButtonHandlers = {
-    roads: {
-      increment: roadsIncrement,
-      increment5: roadsIncrement5,
-      decrement: roadsDecrement,
-      decrement5: roadsDecrement5
-    },
-    cities: {
-      increment: citiesIncrement,
-      increment5: citiesIncrement5,
-      decrement: citiesDecrement,
-      decrement5: citiesDecrement5
-    },
-    monasteries: {
-      increment: monasteriesIncrement,
-      increment5: monasteriesIncrement5,
-      decrement: monasteriesDecrement,
-      decrement5: monasteriesDecrement5
-    },
-    fields: {
-      increment: fieldsIncrement,
-      increment5: fieldsIncrement5,
-      decrement: fieldsDecrement,
-      decrement5: fieldsDecrement5
-    }
+  const setScore = (category: keyof ScoreCategories, score: number): void => {
+    setEditScores(prev => ({
+      ...prev,
+      [category]: Math.max(0, score)
+    }));
   };
 
   useEffect(() => {
@@ -106,51 +64,17 @@ export const EditScoreModal: React.FC<EditScoreModalProps> = ({ isOpen, onClose,
         </div>
         
         <div className="space-y-3 md:space-y-4 mb-4 md:mb-6">
-          {scoreCategories.map(category => {
-            const handlers = holdButtonHandlers[category.key];
-            return (
-              <div key={category.key} className="flex items-center justify-between p-2 md:p-3 bg-znr-tertiary rounded-xl">
-                <div className="flex items-center gap-2 md:gap-3 flex-1 min-w-0">
-                  <span className="text-base md:text-lg flex-shrink-0">{category.icon}</span>
-                  <span className="text-sm md:text-base text-znr-text-dim truncate max-w-[80px] sm:max-w-none">{category.label}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  {/* -5 Button */}
-                  {/* <button
-                    {...handlers.decrement5}
-                    className="w-6 h-6 md:w-7 md:h-7 bg-znr-elevated rounded-lg flex items-center justify-center text-znr-text-dim hover:bg-znr-hover text-xs"
-                  >
-                    -5
-                  </button> */}
-                  {/* -1 Button */}
-                  <button
-                    {...handlers.decrement}
-                    className="w-7 h-7 md:w-8 md:h-8 bg-znr-elevated rounded-lg flex items-center justify-center text-znr-text-dim hover:bg-znr-hover"
-                  >
-                    <Minus size={14} />
-                  </button>
-                  {/* Score Display */}
-                  <div className="min-w-[35px] md:min-w-[40px] text-center text-base md:text-lg text-znr-text">
-                    {editScores[category.key]}
-                  </div>
-                  {/* +1 Button */}
-                  <button
-                    {...handlers.increment}
-                    className="w-7 h-7 md:w-8 md:h-8 bg-znr-elevated rounded-lg flex items-center justify-center text-znr-text-dim hover:bg-znr-hover"
-                  >
-                    <Plus size={16} />
-                  </button>
-                  {/* +5 Button */}
-                  {/* <button
-                    {...handlers.increment5}
-                    className="w-6 h-6 md:w-7 md:h-7 bg-znr-elevated rounded-lg flex items-center justify-center text-znr-text-dim hover:bg-znr-hover text-xs"
-                  >
-                    +5
-                  </button> */}
-                </div>
-              </div>
-            );
-          })}
+          {scoreCategories.map(category => (
+            <ScoreControl
+              key={category.key}
+              category={category}
+              currentScore={editScores[category.key]}
+              onUpdateScore={updateScore}
+              onSetScore={setScore}
+              variant="modal"
+              allowManualInput={true}
+            />
+          ))}
         </div>
 
         <div className="text-center mb-4 md:mb-6">
