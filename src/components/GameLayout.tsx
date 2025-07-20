@@ -50,28 +50,6 @@ export const GameLayout: React.FC<GameLayoutProps> = ({
     return () => clearTimeout(timeoutId);
   }, [headerHeight]);
 
-  // Prevent scroll issues on iOS by handling touch events properly
-  useEffect(() => {
-    const preventBodyScroll = (e: TouchEvent) => {
-      // Allow scrolling within the content container
-      if (contentRef.current && contentRef.current.contains(e.target as Node)) {
-        return;
-      }
-      
-      // Prevent default scroll behavior outside content container
-      e.preventDefault();
-    };
-
-    // Add touch event listeners to prevent scroll issues
-    document.addEventListener('touchstart', preventBodyScroll, { passive: false });
-    document.addEventListener('touchmove', preventBodyScroll, { passive: false });
-
-    return () => {
-      document.removeEventListener('touchstart', preventBodyScroll);
-      document.removeEventListener('touchmove', preventBodyScroll);
-    };
-  }, []);
-
   // Calculate safe spacing values
   const topSpacing = Math.max(headerHeight + 40, 140); // Minimum fallback height
   const contentOpacity = isLayoutReady ? 1 : 0; // Fade in when layout is ready
