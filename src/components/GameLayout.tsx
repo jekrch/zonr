@@ -3,6 +3,7 @@ import { ScoreTrackBorder } from './ScoreTrackBorder';
 import { PlayerHeader } from './PlayerHeader';
 import { ScoreInputSection } from './ScoreInputSection';
 import { ScoreHistorySection } from './ScoreHistorySection';
+import { MedievalBackground } from './MedievalBackground';
 import { useDimensions } from '../hooks/useDimensions';
 import type { GameState, ScoreCategories, ScoreEntry } from '../types';
 import { GameOptionsSection } from './GameOptionsSection';
@@ -10,7 +11,7 @@ import { GameOptionsSection } from './GameOptionsSection';
 interface GameLayoutProps {
   gameState: GameState;
   onUpdateScore: (category: keyof ScoreCategories, delta: number) => void;
-  onSetScore: (category: keyof ScoreCategories, score: number) => void; // Add this prop
+  onSetScore: (category: keyof ScoreCategories, score: number) => void;
   onAddScore: () => void;
   onSelectPlayer: (playerIndex: number) => void;
   onEditScore: (entry: ScoreEntry) => void;
@@ -57,7 +58,14 @@ export const GameLayout: React.FC<GameLayoutProps> = ({
   const contentOpacity = isLayoutReady ? 1 : 0; // Fade in when layout is ready
 
   return (
-    <div className="fixed inset-0 bg-znr-elevated text-znr-text overflow-hidden">
+    <div className="fixed inset-0 text-znr-text overflow-hidden ">
+      {/* Medieval Background - positioned at low z-index, only shows on desktop */}
+      <MedievalBackground />
+      
+      {/* Fallback solid background for mobile or when medieval background is hidden */}
+      <div className="fixed inset-0 bg-znr-elevated lg:hidden z-[1] " />
+      
+
       <ScoreTrackBorder players={gameState.players} />
       
       <PlayerHeader
@@ -67,15 +75,15 @@ export const GameLayout: React.FC<GameLayoutProps> = ({
         onSelectPlayer={onSelectPlayer}
       />
 
-      {/* Content Container with improved mobile handling */}
+      {/* Content Container with semi-transparent background */}
       <div 
         ref={contentRef}
-        className="absolute left-6 right-6 bottom-8 bg-znr-primary z-[40] rounded-lg znr-scroll-enhanced"
+        className="absolute left-6 right-6 bottom-8 z-[40] rounded-lg znr-scroll-enhanced backdrop-blur-smx max-[70em]:bg-[var(--znr-primary)]"
         style={{ 
           top: `${topSpacing}px`,
           opacity: contentOpacity,
           transition: 'opacity 0.2s ease-in-out',
-          overflow: 'hidden' // Changed from overflow-y-auto to be more explicit
+          overflow: 'hidden'
         }}
       >
         <div 
@@ -91,7 +99,7 @@ export const GameLayout: React.FC<GameLayoutProps> = ({
                 currentScores={gameState.currentScores}
                 activePlayerName={gameState.getActivePlayer()?.getPlayerName()}
                 onUpdateScore={onUpdateScore}
-                onSetScore={onSetScore} // Add this prop
+                onSetScore={onSetScore}
                 onAddScore={onAddScore}
                 getCurrentTotal={getCurrentTotal}
               />

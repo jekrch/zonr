@@ -22,7 +22,7 @@
   --znr-text-accent: #d4a574;
   --znr-text-dark: #0a0907;
 
-  --znr-accent: #d4a574;
+  --znr-accent: #664a2b;
   --znr-accent-alt: #a67c52;
 
   --znr-border: #3d342a;
@@ -76,7 +76,7 @@
   --znr-text-accent: #7fb069;
   --znr-text-dark: #0d1117;
 
-  --znr-accent: #7fb069;
+  --znr-accent: #425d36;
   --znr-accent-alt: #588157;
 
   --znr-border: #30363d;
@@ -99,7 +99,7 @@
   --znr-text-dark: #0f0f23;
 
   --znr-accent: #6c63ff;
-  --znr-accent-alt: #5753d9;
+  --znr-accent-alt: #3b37a3;
 
   --znr-border: #3d3d66;
   --znr-border-soft: rgba(61, 61, 102, 0.3);
@@ -592,5 +592,146 @@ html, body {
   /* But allow scrolling in scroll containers */
   .znr-scroll-enhanced {
     touch-action: pan-y;
+  }
+}
+
+/* Medieval Background Animations - Add these to your App.css */
+
+@keyframes medievalMist {
+  0%, 100% {
+    opacity: 0.05;
+    transform: translateX(0px);
+  }
+  50% {
+    opacity: 0.15;
+    transform: translateX(20px);
+  }
+}
+
+@keyframes windmillSpin {
+  0% {
+    transform: translateX(-50%) rotate(0deg);
+  }
+  100% {
+    transform: translateX(-50%) rotate(360deg);
+  }
+}
+
+@keyframes castleFlag {
+  0%, 100% {
+    transform: translateX(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateX(2px) rotate(2deg);
+  }
+}
+
+@keyframes hillsParallax {
+  0%, 100% {
+    transform: translateX(0px);
+  }
+  50% {
+    transform: translateX(10px);
+  }
+}
+
+@keyframes mysticalGlow {
+  0%, 100% {
+    opacity: 0.1;
+    filter: blur(1px);
+  }
+  50% {
+    opacity: 0.3;
+    filter: blur(0px);
+  }
+}
+
+/* Enhanced floating animation for particles */
+@keyframes medievalFloat {
+  0%, 100% {
+    transform: translateY(0px) translateX(0px) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-15px) translateX(5px) rotate(90deg);
+  }
+  50% {
+    transform: translateY(-8px) translateX(0px) rotate(180deg);
+  }
+  75% {
+    transform: translateY(-20px) translateX(-5px) rotate(270deg);
+  }
+}
+
+/* Apply animations to medieval elements */
+.medieval-mist {
+  animation: medievalMist 8s ease-in-out infinite;
+}
+
+.windmill-blades {
+  animation: windmillSpin 12s linear infinite;
+}
+
+.castle-elements {
+  animation: castleFlag 4s ease-in-out infinite;
+}
+
+.hills-layer {
+  animation: hillsParallax 15s ease-in-out infinite;
+}
+
+.mystical-glow {
+  animation: mysticalGlow 6s ease-in-out infinite;
+}
+
+.medieval-float {
+  animation: medievalFloat 6s ease-in-out infinite;
+}
+
+/* Enhanced theme-specific medieval elements */
+[data-theme="forest"] .medieval-background {
+  --medieval-accent: var(--znr-accent);
+  --medieval-mist: rgba(127, 176, 105, 0.1);
+}
+
+[data-theme="royal"] .medieval-background {
+  --medieval-accent: var(--znr-accent);
+  --medieval-mist: rgba(108, 99, 255, 0.1);
+}
+
+[data-theme="sunset"] .medieval-background {
+  --medieval-accent: var(--znr-accent);
+  --medieval-mist: rgba(255, 140, 66, 0.1);
+}
+
+/* Default theme */
+.medieval-background {
+  --medieval-accent: var(--znr-accent);
+  --medieval-mist: rgba(212, 165, 116, 0.1);
+}
+
+/* Responsive medieval background */
+@media (max-width: 1023px) {
+  .medieval-background {
+    display: none !important;
+  }
+}
+
+/* Ultra-wide screen enhancements */
+@media (min-width: 1920px) {
+  .medieval-background {
+    /* Add more detailed elements for very wide screens */
+  }
+  
+  .medieval-background::before {
+    content: '';
+    position: absolute;
+    top: 40%;
+    left: 5%;
+    width: 100px;
+    height: 60px;
+    background: linear-gradient(to bottom, transparent, var(--znr-text-muted));
+    opacity: 0.1;
+    clip-path: polygon(0% 100%, 20% 80%, 40% 85%, 60% 75%, 80% 82%, 100% 78%, 100% 100%);
+    animation: hillsParallax 20s ease-in-out infinite reverse;
   }
 }

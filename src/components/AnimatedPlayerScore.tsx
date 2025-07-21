@@ -22,7 +22,7 @@ export const AnimatedPlayerScore: React.FC<AnimatedPlayerScoreProps> = ({
       className={`
         bg-znr-secondary border-2 rounded-lg lg:rounded-xl p-2 md:p-3 cursor-pointer 
         transition-all duration-300 flex flex-row items-center justify-center gap-3 sm:gap-4
-        shadow-lg hover:shadow-xl hover:-translate-y-0.5 relative min-h-[70px] sm:min-h-[65px] lg:min-h-[75px]
+        shadow-lg hover:shadow-xl hover:-translate-y-0.5 relative min-h-[70px] sm:min-h-[65px] lg:min-h-[75px] md:min-w-[15em]
         ${isActive 
           ? 'border-znr-border-soft bg-gradient-to-br from-znr-secondary to-znr-tertiary shadow-[0_0_0_2px_var(--color-znr-border-accent)]' 
           : 'border-transparent hover:border-znr-hover'
