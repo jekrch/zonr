@@ -258,7 +258,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                   <div className="space-y-2 text-sm text-znr-text-muted">
                     <div className="flex justify-between items-center">
                       <span>Version</span>
-                      <span className="text-znr-text">1.1</span>
+                      <span className="text-znr-text">1.2</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span>Built with</span>

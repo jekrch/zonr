@@ -1,7 +1,7 @@
 # Zonr :european_castle:
 
 
-![Version](https://img.shields.io/badge/version-1.1-blue) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![Version](https://img.shields.io/badge/version-1.2-blue) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 <a href="https://jekrch.github.io/zonr">jekrch.github.io/zonr/</a>
 
