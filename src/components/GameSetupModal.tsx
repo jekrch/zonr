@@ -110,9 +110,9 @@ export const GameSetupModal: React.FC<GameSetupModalProps> = ({ isOpen, onClose,
   if (!isOpen) return null;
   
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-[80] p-4 overflow-hidden">
+    <div className="fixed inset-0 flex items-center justify-center z-[80] p-4 overflow-hidden max-h-[100vh]">
       {/* Medieval Background - behind modal content */}
-      <div className="absolute inset-0 z-[1] overflow-hidden">
+      <div className="absolute inset-0 z-[1] overflow-hidden max-h-[100vh]">
         <MedievalBackground showOnAllSizes={true} />
       </div>
       
