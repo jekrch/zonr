@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Plus, Minus, Edit3 } from 'lucide-react';
 import { useHoldButton } from '../hooks/useHoldButton';
 import type { ScoreCategories, ScoreCategory } from '../types';
+import Portal from '@/Portal';
 
 interface ScoreControlProps {
   category: ScoreCategory;
@@ -126,6 +127,7 @@ export const ScoreControl: React.FC<ScoreControlProps> = ({
 
       {/* Edit Modal */}
       {showEditModal && (
+         <Portal>
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[90] p-4 select-none">
           <div className="bg-znr-secondary border border-znr-border rounded-2xl p-6 max-w-xs w-full shadow-2xl">
             <div className="text-center mb-6">
@@ -158,13 +160,14 @@ export const ScoreControl: React.FC<ScoreControlProps> = ({
               </button>
               <button
                 onClick={handleModalSave}
-                className="flex-1 py-3 bg-gradient-to-r from-znr-accent-alt to-znr-accent rounded-xl text-znr-text-dark font-semibold transition-all hover:shadow-lg"
+                className="flex-1 py-3 bg-gradient-to-r from-znr-accent-alt to-znr-accent rounded-xl text-znr-text font-semibold transition-all hover:shadow-lg"
               >
                 Save
               </button>
             </div>
           </div>
         </div>
+        </Portal>
       )}
     </>
   );

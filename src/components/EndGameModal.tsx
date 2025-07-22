@@ -594,7 +594,7 @@ const handleShare = async () => {
               <div className="flex gap-3 flex-wrap">
                 <button
                   onClick={onRestartGame}
-                  className="flex-1 min-w-48 flex items-center gap-3 p-3 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 rounded-xl text-znr-text transition-all duration-300"
+                  className="flex-1 min-w-48 flex items-center gap-3 p-3 pl-6 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 rounded-xl text-znr-text transition-all duration-300"
                 >
                   <RotateCcw size={18} className="text-amber-400" />
                   <div className="text-left">
@@ -605,7 +605,7 @@ const handleShare = async () => {
                 
                 <button
                   onClick={onNewGame}
-                  className="flex-1 min-w-48 flex items-center gap-3 p-3 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/40 rounded-xl text-znr-text transition-all duration-300"
+                  className="flex-1 min-w-48 flex items-center gap-3 p-3 pl-6 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/40 rounded-xl text-znr-text transition-all duration-300"
                 >
                   <Plus size={18} className="text-blue-400" />
                   <div className="text-left">

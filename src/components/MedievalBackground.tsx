@@ -1,16 +1,14 @@
 import React from 'react';
-import '../App.css'
 
 export const MedievalBackground: React.FC = () => {
   return (
-    <div className="fixed inset-0 z-[1] overflow-hidden pointer-events-none select-none medieval-background">
+    <div className="absolute inset-0 overflow-hidden pointer-events-none select-none medieval-background">
       {/* Only show on larger screens */}
-      <div className="hidden lg:block absolute inset-0">
-        
+      <div className="hidden min-[70em]:block absolute inset-0">
         
         {/* Base Sky Gradient */}
         <div 
-          className="absolute inset-0 "
+          className="absolute inset-0"
           style={{
             background: `linear-gradient(to bottom, 
               var(--znr-secondary) 0%, 

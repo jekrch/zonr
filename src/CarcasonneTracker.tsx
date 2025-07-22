@@ -46,13 +46,9 @@ const CarcassonneTracker: React.FC = () => {
     return () => window.removeEventListener('popstate', handlePopState);
   }, [gameState.players.length]);
 
-  // Add this function to handle direct score setting
   const handleSetScore = (category: keyof ScoreCategories, score: number): void => {
-    // Calculate the difference between the new score and current score
     const currentScore = gameState.currentScores[category];
     const delta = score - currentScore;
-    
-    // Use the existing updateCurrentScore function with the calculated delta
     updateCurrentScore(category, delta);
   };
 
@@ -111,7 +107,7 @@ const CarcassonneTracker: React.FC = () => {
       <GameLayout
         gameState={gameState}
         onUpdateScore={updateCurrentScore}
-        onSetScore={handleSetScore} // Add this line
+        onSetScore={handleSetScore}
         onAddScore={addScore}
         onSelectPlayer={selectPlayer}
         onEditScore={handleEditScore}

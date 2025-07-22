@@ -135,7 +135,7 @@ export const GameOptionsSection: React.FC<GameOptionsSectionProps> = ({
             onClick={handleRestartGame}
             className="w-full flex items-center gap-3 p-3 bg-znr-tertiary hover:bg-znr-elevated rounded-xl text-left transition-colors"
           >
-            <div className="w-8 h-8 bg-amber-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+            <div className="w-8 h-8 bg-amber-500/70 rounded-lg flex items-center justify-center flex-shrink-0">
               <RotateCcw size={16} className="text-amber-400" />
             </div>
             <div className="flex-1 min-w-0">

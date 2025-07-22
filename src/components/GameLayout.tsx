@@ -1,12 +1,11 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React from 'react';
 import { ScoreTrackBorder } from './ScoreTrackBorder';
 import { PlayerHeader } from './PlayerHeader';
 import { ScoreInputSection } from './ScoreInputSection';
 import { ScoreHistorySection } from './ScoreHistorySection';
-import { MedievalBackground } from './MedievalBackground';
-import { useDimensions } from '../hooks/useDimensions';
-import type { GameState, ScoreCategories, ScoreEntry } from '../types';
 import { GameOptionsSection } from './GameOptionsSection';
+import { MedievalBackground } from './MedievalBackground';
+import type { GameState, ScoreCategories, ScoreEntry } from '../types';
 
 interface GameLayoutProps {
   gameState: GameState;
@@ -24,77 +23,38 @@ interface GameLayoutProps {
 export const GameLayout: React.FC<GameLayoutProps> = ({
   gameState,
   onUpdateScore,
-  onSetScore, 
+  onSetScore,
   onAddScore,
   onSelectPlayer,
   onEditScore,
   getCurrentTotal,
-  onRestartGame,    
-  onNewGame,       
-  onEndGame        
+  onRestartGame,
+  onNewGame,
+  onEndGame
 }) => {
-  const headerRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
-  const { headerHeight } = useDimensions(gameState.players.length, headerRef);
-  const [isLayoutReady, setIsLayoutReady] = useState(false);
-
-  // Ensure layout is properly initialized
-  useEffect(() => {
-    const checkLayout = () => {
-      if (headerHeight > 0) {
-        setIsLayoutReady(true);
-      }
-    };
-
-    checkLayout();
-    
-    // Also check after a delay to handle initial load timing
-    const timeoutId = setTimeout(checkLayout, 200);
-    return () => clearTimeout(timeoutId);
-  }, [headerHeight]);
-
-  // Calculate safe spacing values
-  const topSpacing = Math.max(headerHeight + 40, 125); // Minimum fallback height
-  const contentOpacity = isLayoutReady ? 1 : 0; // Fade in when layout is ready
-
   return (
-    <div className="fixed inset-0 text-znr-text overflow-hidden ">
-      {/* Medieval Background - positioned at low z-index, only shows on desktop */}
-      <MedievalBackground />
+    <div className="fixed inset-0 bg-znr-elevated text-znr-text flex flex-col">
+      {/* Medieval Background - shows on larger screens, stays behind content */}
+      <div className="absolute inset-0 z-[10]">
+        <MedievalBackground />
+      </div>
       
-      {/* Fallback solid background for mobile or when medieval background is hidden */}
-      <div className="fixed inset-0 bg-znr-elevated lg:hidden z-[1] " />
-      
-
       <ScoreTrackBorder players={gameState.players} />
       
-      <PlayerHeader
-        ref={headerRef}
-        players={gameState.players}
-        activePlayer={gameState.activePlayer}
-        onSelectPlayer={onSelectPlayer}
-      />
+      {/* Header - takes natural height, above background */}
+      <div className="flex-shrink-0 p-6 pb-0 mt-2 not-first:relative z-[60]">
+        <PlayerHeader
+          players={gameState.players}
+          activePlayer={gameState.activePlayer}
+          onSelectPlayer={onSelectPlayer}
+        />
+      </div>
 
-      {/* Content Container with semi-transparent background */}
-      <div 
-        ref={contentRef}
-        className="absolute left-6 right-6 bottom-8 z-[40] rounded-lg znr-scroll-enhanced backdrop-blur-smx max-[70em]:bg-[var(--znr-primary)]"
-        style={{ 
-          top: `${topSpacing}px`,
-          opacity: contentOpacity,
-          transition: 'opacity 0.2s ease-in-out',
-          overflow: 'hidden'
-        }}
-      >
-        <div 
-          className="h-full overflow-y-auto overscroll-contain"
-          style={{
-            WebkitOverflowScrolling: 'touch', // Better iOS scrolling
-            scrollbarWidth: 'thin'
-          }}
-        >
-          <div className="p-2 md:p-4">
-            <div className="max-w-2xl mx-auto w-full">
+      {/* Content - fills remaining space, above background */}
+      <div className="flex-1 overflow-hidden p-6 pt-2 mb-2 relative z-[40] ">
+        <div className="h-full max-[70em]:bg-[var(--znr-primary)] rounded-lg overflow-y-auto">
+          <div className="p-2">
+            <div className="max-w-2xl mx-auto">
               <ScoreInputSection
                 currentScores={gameState.currentScores}
                 activePlayerName={gameState.getActivePlayer()?.getPlayerName()}
@@ -115,8 +75,8 @@ export const GameLayout: React.FC<GameLayoutProps> = ({
                 onEndGame={onEndGame}
               />
               
-              {/* Bottom padding for iOS safe area */}
-              <div className="h-4 md:h-6" />
+              {/* Bottom safe area */}
+              <div className="h-6" />
             </div>
           </div>
         </div>
