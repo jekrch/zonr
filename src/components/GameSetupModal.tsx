@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Plus, Minus } from 'lucide-react';
 import { Meeple } from './Meeple';
+import { MedievalBackground } from './MedievalBackground';
 
 export interface GameSetupModalProps {
   isOpen: boolean;
@@ -109,8 +110,14 @@ export const GameSetupModal: React.FC<GameSetupModalProps> = ({ isOpen, onClose,
   if (!isOpen) return null;
   
   return (
-    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[80] p-4">
-      <div className="bg-znr-secondary border border-znr-border rounded-2xl p-4 md:p-6 max-w-md w-full">
+    <div className="fixed inset-0 flex items-center justify-center z-[80] p-4">
+      {/* Medieval Background - behind modal content */}
+      <div className="absolute inset-0 z-[1]">
+        <MedievalBackground showOnAllSizes={true} />
+      </div>
+      
+      {/* Modal Content - above background */}
+      <div className="bg-znr-secondary border border-znr-border rounded-2xl p-4 md:p-6 max-w-md w-full relative z-[10]">
         <h2 className="text-xl md:text-2xl font-light text-znr-text mb-4 md:mb-6 text-center">
           Create New Game
         </h2>
@@ -144,7 +151,7 @@ export const GameSetupModal: React.FC<GameSetupModalProps> = ({ isOpen, onClose,
                   </button>
 
                   {dropdownOpen === index && (
-                    <div className="absolute top-full left-0 mt-1 bg-znr-secondary border border-znr-border rounded-xl shadow-xl z-[100] min-w-[180px] overflow-hidden">
+                    <div className="absolute top-full left-0 mt-1 bg-znr-secondary border border-znr-border rounded-xl shadow-xl z-[50] min-w-[180px] overflow-hidden">
                       {availableColors.map((color) => (
                         <button
                           key={color.value}

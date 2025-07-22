@@ -710,17 +710,11 @@ html, body {
 }
 
 /* Responsive medieval background */
-@media (max-width: 1023px) {
-  .medieval-background {
-    display: none !important;
-  }
-}
+
 
 /* Ultra-wide screen enhancements */
 @media (min-width: 1920px) {
-  .medieval-background {
-    /* Add more detailed elements for very wide screens */
-  }
+
   
   .medieval-background::before {
     content: '';
