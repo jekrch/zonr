@@ -4,6 +4,7 @@ export interface ScoreCategories {
   cities: number;
   monasteries: number;
   fields: number;
+  other: number; 
 }
 
 export interface ScoreEntry {

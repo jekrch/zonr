@@ -24,7 +24,7 @@ const getColorFromIndex = (index: number, fallbackIndex: number = 0): string => 
  * 
  * Format: {playerData}_{activePlayer}~{turn}~{theme}~{currentPoints}~{selectedCategory}~{turnEntries}
  * Player format: {encodedName}#{colorIndex}-{turnScores}
- * Turn scores format: r{roads}c{cities}m{monasteries}f{fields}
+ * Turn scores format: r{roads}c{cities}m{monasteries}f{fields}o{other} or "z" for zero-point turns
  * Turn entries format: {category}{points},{category}{points}...
  * 
  * @param gameState The current game state to encode
@@ -40,6 +40,13 @@ export const encodeGameState = (gameState: GameState, theme: string = 'default')
       if (entry.scores.cities > 0) turnStr += `c${entry.scores.cities}`;
       if (entry.scores.monasteries > 0) turnStr += `m${entry.scores.monasteries}`;
       if (entry.scores.fields > 0) turnStr += `f${entry.scores.fields}`;
+      if (entry.scores.other > 0) turnStr += `o${entry.scores.other}`;
+      
+      // If no scores, this is a zero-point turn - encode as "z"
+      if (turnStr === '') {
+        turnStr = 'z';
+      }
+      
       return turnStr;
     });
     
@@ -124,7 +131,7 @@ export const decodeGameState = (encoded: string): { gameState: GameState | null;
         
         if (dashIndex !== -1) {
           colorIndex = parseInt(afterHash.substring(0, dashIndex));
-          scoreParts = afterHash.substring(dashIndex + 1).split('-').filter(part => part);
+          scoreParts = afterHash.substring(dashIndex + 1).split('-');
         } else {
           colorIndex = parseInt(afterHash);
           scoreParts = [];
@@ -140,21 +147,27 @@ export const decodeGameState = (encoded: string): { gameState: GameState | null;
       const color = getColorFromIndex(colorIndex, index);
       
       const history: ScoreEntry[] = scoreParts.map((scorePart, historyIndex) => {
-        const scores = { roads: 0, cities: 0, monasteries: 0, fields: 0 };
+        const scores = { roads: 0, cities: 0, monasteries: 0, fields: 0, other: 0 };
         
-        const matches = scorePart.match(/([rcmf])(\d+)/g) || [];
-        matches.forEach(match => {
-          const letter = match[0];
-          const value = parseInt(match.slice(1));
-          switch (letter) {
-            case 'r': scores.roads = value; break;
-            case 'c': scores.cities = value; break;
-            case 'm': scores.monasteries = value; break;
-            case 'f': scores.fields = value; break;
-          }
-        });
+        // Handle zero-point turns encoded as "z"
+        if (scorePart === 'z' || scorePart === '') {
+          // This is a zero-point turn, all scores remain 0
+        } else {
+          const matches = scorePart.match(/([rcmfo])(\d+)/g) || [];
+          matches.forEach(match => {
+            const letter = match[0];
+            const value = parseInt(match.slice(1));
+            switch (letter) {
+              case 'r': scores.roads = value; break;
+              case 'c': scores.cities = value; break;
+              case 'm': scores.monasteries = value; break;
+              case 'f': scores.fields = value; break;
+              case 'o': scores.other = value; break;
+            }
+          });
+        }
         
-        const total = scores.roads + scores.cities + scores.monasteries + scores.fields;
+        const total = scores.roads + scores.cities + scores.monasteries + scores.fields + scores.other;
         
         return {
           turn: historyIndex + 1,
@@ -203,7 +216,7 @@ export const decodeGameState = (encoded: string): { gameState: GameState | null;
     const gameState = new GameState(
       players,
       activePlayer,
-      { roads: 0, cities: 0, monasteries: 0, fields: 0 }, // currentScores always reset
+      { roads: 0, cities: 0, monasteries: 0, fields: 0, other: 0 }, // currentScores always reset
       turn,
       currentPoints,
       selectedCategory,

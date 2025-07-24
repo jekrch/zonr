@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ChevronDown, Edit2 } from 'lucide-react';
-import type { Player, ScoreEntry, ScoreCategory, ScoreCategories } from '../types';
+import type { Player, ScoreEntry, ScoreCategory } from '../types';
 
 interface ScoreHistorySectionProps {
   player: Player;
@@ -8,11 +8,11 @@ interface ScoreHistorySectionProps {
 }
 
 const scoreCategories: ScoreCategory[] = [
-  { key: 'other', label: 'Any', icon: '➕' },
   { key: 'roads', label: 'Roads', icon: '🛤️' },
   { key: 'cities', label: 'Cities', icon: '🏰' },
   { key: 'monasteries', label: 'Monasteries', icon: '⛪' },
-  { key: 'fields', label: 'Fields', icon: '🌾' }
+  { key: 'fields', label: 'Fields', icon: '🌾' },
+  { key: 'other', label: 'Any', icon: '➕' }
 ];
 
 export const ScoreHistorySection: React.FC<ScoreHistorySectionProps> = ({
@@ -53,13 +53,8 @@ export const ScoreHistorySection: React.FC<ScoreHistorySectionProps> = ({
             
             <div className="flex gap-1 md:gap-2 items-center flex-wrap">
               {scoreCategories.map(category => {
-                // The 'other' key is not a property on ScoreCategories, so we skip it.
-                if (category.key === 'other') {
-                  return null;
-                }
-                
-                // After the check, TypeScript knows category.key is a valid `keyof ScoreCategories`.
-                const score = entry.scores[category.key];
+                // Handle backward compatibility - older entries might not have "other" scores
+                const score = entry.scores[category.key] || 0;
                 
                 return score > 0 && (
                   <div key={category.key} className="flex items-center gap-0.5 md:gap-1 text-xs md:text-sm text-znr-text-dim">

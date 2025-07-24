@@ -71,7 +71,7 @@ export const ScoreInputSection: React.FC<ScoreInputSectionProps> = ({
       {/* Finish Turn Button - Always available */}
       <button
         onClick={onFinishTurn}
-        className="w-full py-4 md:py-5 rounded-lg md:rounded-2xl font-semibold text-sm md:text-base uppercase tracking-wide transition-all touch-manipulation bg-gradient-to-r from-znr-accent-alt to-znr-accent text-znr-text-dark shadow-lg hover:shadow-xl hover:-translate-y-1"
+        className="w-full py-4 md:py-5 rounded-lg md:rounded-2xl font-semibold text-sm md:text-base uppercase tracking-wide transition-all touch-manipulation bg-gradient-to-r from-znr-accent-alt to-znr-accent text-znr-text shadow-lg hover:shadow-xl hover:-translate-y-1"
       >
         Finish {activePlayerName}'s Turn
       </button>

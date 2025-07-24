@@ -13,7 +13,7 @@ export interface EditScoreModalProps {
 
 export const EditScoreModal: React.FC<EditScoreModalProps> = ({ isOpen, onClose, onSave, entry }) => {
   const [editScores, setEditScores] = useState<ScoreCategories>({
-    roads: 0, cities: 0, monasteries: 0, fields: 0
+    roads: 0, cities: 0, monasteries: 0, fields: 0, other: 0
   });
 
   const updateScore = (category: keyof ScoreCategories, delta: number): void => {
@@ -32,7 +32,13 @@ export const EditScoreModal: React.FC<EditScoreModalProps> = ({ isOpen, onClose,
 
   useEffect(() => {
     if (entry) {
-      setEditScores(entry.scores);
+      setEditScores({
+        roads: entry.scores.roads || 0,
+        cities: entry.scores.cities || 0,
+        monasteries: entry.scores.monasteries || 0,
+        fields: entry.scores.fields || 0,
+        other: entry.scores.other || 0
+      });
     }
   }, [entry]);
 
@@ -49,7 +55,8 @@ export const EditScoreModal: React.FC<EditScoreModalProps> = ({ isOpen, onClose,
     { key: 'roads', label: 'Roads', icon: '🛤️' },
     { key: 'cities', label: 'Cities', icon: '🏰' },
     { key: 'monasteries', label: 'Monasteries', icon: '⛪' },
-    { key: 'fields', label: 'Fields', icon: '🌾' }
+    { key: 'fields', label: 'Fields', icon: '🌾' },
+    { key: 'other', label: 'Any', icon: '➕' }
   ];
 
   if (!isOpen || !entry) return null;

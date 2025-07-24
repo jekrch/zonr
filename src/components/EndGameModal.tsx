@@ -20,8 +20,9 @@ interface EndGameModalProps {
 const scoreCategories = [
   { key: 'roads' as const, label: 'Roads', icon: '🛤️', color: 'text-blue-400' },
   { key: 'cities' as const, label: 'Cities', icon: '🏰', color: 'text-purple-400' },
-  { key: 'monasteries' as const, label: 'Mnsts', icon: '⛪', color: 'text-green-400' },
-  { key: 'fields' as const, label: 'Fields', icon: '🌾', color: 'text-yellow-400' }
+  { key: 'monasteries' as const, label: 'Monst', icon: '⛪', color: 'text-green-400' },
+  { key: 'fields' as const, label: 'Fields', icon: '🌾', color: 'text-yellow-400' },
+  { key: 'other' as const, label: 'Any', icon: '➕', color: 'text-orange-400' }
 ];
 
 export const EndGameModal: React.FC<EndGameModalProps> = ({ 
@@ -291,19 +292,21 @@ export const EndGameModal: React.FC<EndGameModalProps> = ({
     mostProductiveCategory: (() => {
       const categoryTotals = gameState.players.reduce((acc, player) => {
         player.history.forEach(entry => {
-          acc.roads += entry.scores.roads;
-          acc.cities += entry.scores.cities;
-          acc.monasteries += entry.scores.monasteries;
-          acc.fields += entry.scores.fields;
+          acc.roads += entry.scores.roads || 0;
+          acc.cities += entry.scores.cities || 0;
+          acc.monasteries += entry.scores.monasteries || 0;
+          acc.fields += entry.scores.fields || 0;
+          acc.other += entry.scores.other || 0;
         });
         return acc;
-      }, { roads: 0, cities: 0, monasteries: 0, fields: 0 });
+      }, { roads: 0, cities: 0, monasteries: 0, fields: 0, other: 0 });
       
       const categories = [
         { name: 'Roads', value: categoryTotals.roads, icon: '🛤️' },
         { name: 'Cities', value: categoryTotals.cities, icon: '🏰' },
         { name: 'Monasteries', value: categoryTotals.monasteries, icon: '⛪' },
-        { name: 'Fields', value: categoryTotals.fields, icon: '🌾' }
+        { name: 'Fields', value: categoryTotals.fields, icon: '🌾' },
+        { name: 'Any', value: categoryTotals.other, icon: '➕' }
       ];
       
       return categories.reduce((prev, current) => current.value > prev.value ? current : prev);
@@ -313,12 +316,13 @@ export const EndGameModal: React.FC<EndGameModalProps> = ({
   // Calculate individual player breakdowns
   const playerBreakdowns = sortedPlayers.map(player => {
     const breakdown = player.history.reduce((acc, entry) => {
-      acc.roads += entry.scores.roads;
-      acc.cities += entry.scores.cities;
-      acc.monasteries += entry.scores.monasteries;
-      acc.fields += entry.scores.fields;
+      acc.roads += entry.scores.roads || 0;
+      acc.cities += entry.scores.cities || 0;
+      acc.monasteries += entry.scores.monasteries || 0;
+      acc.fields += entry.scores.fields || 0;
+      acc.other += entry.scores.other || 0;
       return acc;
-    }, { roads: 0, cities: 0, monasteries: 0, fields: 0 });
+    }, { roads: 0, cities: 0, monasteries: 0, fields: 0, other: 0 });
     
     return { ...player, breakdown };
   });
@@ -569,8 +573,8 @@ const handleShare = async () => {
                       <div className="text-xl font-bold text-znr-text">{player.totalScore}</div>
                     </div>
                     
-                    {/* Category Breakdown */}
-                    <div className="grid grid-cols-4 gap-2">
+                    {/* Category Breakdown - Now includes "Any" */}
+                    <div className="grid grid-cols-5 gap-2">
                       {scoreCategories.map(category => (
                         <div key={category.key} className="bg-znr-secondary/50 rounded-lg p-2 text-center">
                           <div className={`text-sm mb-1 ${category.color}`}>{category.icon}</div>

@@ -27,7 +27,7 @@ export const PointEntrySection: React.FC<PointEntrySectionProps> = ({
   }, [showEditModal]);
 
   const handleEditClick = () => {
-    setInputValue(currentPoints.toString());
+    setInputValue(''); // Start with empty input
     setShowEditModal(true);
   };
 
@@ -119,7 +119,7 @@ export const PointEntrySection: React.FC<PointEntrySectionProps> = ({
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  className="w-full text-center text-3xl font-light bg-znr-elevated border border-znr-border rounded-xl px-4 py-3 text-znr-text focus:outline-none focus:ring-2 focus:ring-znr-accent focus:border-transparent transition-all"
+                  className="w-full text-center text-3xl font-light bg-znr-elevated border border-znr-border rounded-xl px-4 py-3 text-znr-text focus:outline-none focus:ring-2 focus:ring-znr-accent focus:border-transparent focus:placeholder-transparent transition-all"
                   placeholder="0"
                 />
               </div>

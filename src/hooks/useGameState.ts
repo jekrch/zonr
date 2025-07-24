@@ -3,7 +3,7 @@ import { GameState, Player, type ScoreCategories, type ScoreEntry, type TurnEntr
 import { updateURL, loadGameStateFromURL, clearGameFromURL } from '../gameStateUtils';
 
 const createGameStateInstance = (data: any): GameState => {
-  const initialScores = { roads: 0, cities: 0, monasteries: 0, fields: 0 };
+  const initialScores = { roads: 0, cities: 0, monasteries: 0, fields: 0, other: 0 };
   if (!data || !data.players) {
     return new GameState([], 0, initialScores, 1);
   }
@@ -65,7 +65,7 @@ export const useGameState = () => {
     const newGameState = new GameState(
       gamePlayers,
       0,
-      { roads: 0, cities: 0, monasteries: 0, fields: 0 },
+      { roads: 0, cities: 0, monasteries: 0, fields: 0, other: 0 },
       1
     );
 
@@ -83,7 +83,7 @@ export const useGameState = () => {
       const restartedGameState = new GameState(
         restartedPlayers,
         0,
-        { roads: 0, cities: 0, monasteries: 0, fields: 0 },
+        { roads: 0, cities: 0, monasteries: 0, fields: 0, other: 0 },
         1
       );
       
@@ -188,18 +188,38 @@ export const useGameState = () => {
 
   const finishTurn = useCallback((): void => {
     setGameState(prev => {
+      // First, check if there are current points that haven't been added to turn yet
+      let finalTurnEntries = [...prev.turnState.entries];
+      let finalTurnTotal = prev.turnState.total;
+      
+      // If there are current points, automatically add them to the turn
+      if (prev.currentPoints !== 0) {
+        const metadata = categoryMetadata[prev.selectedCategory];
+        const autoEntry = {
+          id: `${Date.now()}-${Math.random()}-auto`,
+          category: prev.selectedCategory,
+          points: prev.currentPoints,
+          categoryName: metadata.name,
+          categoryIcon: metadata.icon
+        };
+        finalTurnEntries = [...finalTurnEntries, autoEntry];
+        finalTurnTotal += prev.currentPoints;
+      }
+      
       // Handle zero-point turns - create empty score entry if no turn entries
-      let scores: ScoreCategories = { roads: 0, cities: 0, monasteries: 0, fields: 0 };
+      let scores: ScoreCategories = { roads: 0, cities: 0, monasteries: 0, fields: 0, other: 0 };
       let total = 0;
 
-      if (prev.turnState.entries.length > 0) {
-        // Convert turn entries to score categories
-        prev.turnState.entries.forEach(entry => {
-          if (entry.category !== 'other') {
+      if (finalTurnEntries.length > 0) {
+        // Convert turn entries to score categories - now including "other"
+        finalTurnEntries.forEach(entry => {
+          if (entry.category === 'other') {
+            scores.other += entry.points;
+          } else {
             scores[entry.category] += entry.points;
           }
         });
-        total = prev.turnState.total;
+        total = finalTurnTotal;
       }
       // If no entries, scores remain all zeros and total is 0 (zero-point turn)
       
@@ -220,7 +240,7 @@ export const useGameState = () => {
       const newGameState = new GameState(
         newPlayers, 
         newActivePlayer, 
-        { roads: 0, cities: 0, monasteries: 0, fields: 0 }, 
+        { roads: 0, cities: 0, monasteries: 0, fields: 0, other: 0 }, 
         newTurn,
         0, // Reset current points
         'other', // Reset to default category
