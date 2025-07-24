@@ -19,10 +19,9 @@ export const PointEntrySection: React.FC<PointEntrySectionProps> = ({
 
   useEffect(() => {
     if (showEditModal && inputRef.current) {
-      setTimeout(() => {
+      requestAnimationFrame(() => {
         inputRef.current?.focus();
-        inputRef.current?.select();
-      }, 100);
+      });
     }
   }, [showEditModal]);
 
@@ -119,7 +118,8 @@ export const PointEntrySection: React.FC<PointEntrySectionProps> = ({
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  className="w-full text-center text-3xl font-light bg-znr-elevated border border-znr-border rounded-xl px-4 py-3 text-znr-text focus:outline-none focus:ring-2 focus:ring-znr-accent focus:border-transparent focus:placeholder-transparent transition-all"
+                  autoFocus
+                  className="w-full text-center text-3xl font-light bg-znr-elevated border border-znr-border rounded-xl px-4 py-3 text-znr-text focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-transparent focus:placeholder-transparent transition-all"
                   placeholder="0"
                 />
               </div>
