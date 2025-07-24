@@ -22,9 +22,10 @@ const getColorFromIndex = (index: number, fallbackIndex: number = 0): string => 
 /**
  * Encodes a GameState object and theme into a compact URL-safe string
  * 
- * Format: {playerData}_{activePlayer}~{turn}~{theme}
+ * Format: {playerData}_{activePlayer}~{turn}~{theme}~{currentPoints}~{selectedCategory}~{turnEntries}
  * Player format: {encodedName}#{colorIndex}-{turnScores}
  * Turn scores format: r{roads}c{cities}m{monasteries}f{fields}
+ * Turn entries format: {category}{points},{category}{points}...
  * 
  * @param gameState The current game state to encode
  * @param theme The current theme (optional, defaults to 'default')
@@ -47,7 +48,16 @@ export const encodeGameState = (gameState: GameState, theme: string = 'default')
     return `${encodeURIComponent(player.name)}${colorPart}-${historyStrings.join('-')}`;
   });
   
-  return `${playerStrings.join('_')}_${gameState.activePlayer}~${gameState.turn}~${theme}`;
+  // Encode turn entries
+  const turnEntriesStr = gameState.turnState.entries.map(entry => {
+    const catCode = entry.category === 'roads' ? 'r' : 
+                   entry.category === 'cities' ? 'c' :
+                   entry.category === 'monasteries' ? 'm' :
+                   entry.category === 'fields' ? 'f' : 'o';
+    return `${catCode}${entry.points}`;
+  }).join(',');
+  
+  return `${playerStrings.join('_')}_${gameState.activePlayer}~${gameState.turn}~${theme}~${gameState.currentPoints}~${gameState.selectedCategory}~${turnEntriesStr}`;
 };
 
 /**
@@ -58,17 +68,28 @@ export const encodeGameState = (gameState: GameState, theme: string = 'default')
  */
 export const decodeGameState = (encoded: string): { gameState: GameState | null; theme: string } => {
   try {
-    // Handle both old format (without theme) and new format (with theme)
     const parts = encoded.split('~');
     let theme = 'default';
     let turnInfo: string;
     let playerSection: string;
+    let currentPoints = 0;
+    let selectedCategory: any = 'other';
+    let turnEntriesStr = '';
 
-    if (parts.length === 3) {
-      // New format: {playerData}~{turn}~{theme}
+    if (parts.length >= 6) {
+      // New format with turn building state
+      const [playerSec, turnInf, themeStr, currentPointsStr, selectedCat, turnEntStr] = parts;
+      playerSection = playerSec;
+      turnInfo = turnInf;
+      theme = themeStr;
+      currentPoints = parseInt(currentPointsStr) || 0;
+      selectedCategory = selectedCat;
+      turnEntriesStr = turnEntStr;
+    } else if (parts.length === 3) {
+      // Old format: {playerData}~{turn}~{theme}
       [playerSection, turnInfo, theme] = parts;
     } else if (parts.length === 2) {
-      // Old format: {playerData}~{turn}
+      // Older format: {playerData}~{turn}
       [playerSection, turnInfo] = parts;
     } else {
       return { gameState: null, theme: 'default' };
@@ -145,16 +166,48 @@ export const decodeGameState = (encoded: string): { gameState: GameState | null;
       
       const totalScore = history.reduce((sum, entry) => sum + entry.total, 0);
       
-      // Create a proper Player instance instead of a plain object
       return new Player(index, name, color, totalScore, history);
     });
     
-    // Create a proper GameState instance instead of a plain object
+    // Decode turn entries (only for new format)
+    const turnEntries = turnEntriesStr ? turnEntriesStr.split(',').map((entryStr, index) => {
+      if (!entryStr) return null;
+      
+      const catCode = entryStr[0];
+      const points = parseInt(entryStr.slice(1));
+      
+      if (isNaN(points)) return null;
+      
+      const categoryMap: any = {
+        'r': { key: 'roads', name: 'Roads', icon: '🛤️' },
+        'c': { key: 'cities', name: 'Cities', icon: '🏰' },
+        'm': { key: 'monasteries', name: 'Monasteries', icon: '⛪' },
+        'f': { key: 'fields', name: 'Fields', icon: '🌾' },
+        'o': { key: 'other', name: 'Other', icon: '➕' }
+      };
+      
+      const cat = categoryMap[catCode] || categoryMap['o'];
+      
+      return {
+        id: `turn-entry-${index}`,
+        category: cat.key,
+        points,
+        categoryName: cat.name,
+        categoryIcon: cat.icon
+      };
+    }).filter(entry => entry !== null) : [];
+    
+    const turnTotal = turnEntries.reduce((sum, entry) => sum + entry.points, 0);
+    
+    // Create a proper GameState instance with all the new properties
     const gameState = new GameState(
       players,
       activePlayer,
-      { roads: 0, cities: 0, monasteries: 0, fields: 0 },
-      turn
+      { roads: 0, cities: 0, monasteries: 0, fields: 0 }, // currentScores always reset
+      turn,
+      currentPoints,
+      selectedCategory,
+      { entries: turnEntries, total: turnTotal }
     );
 
     return { gameState, theme };

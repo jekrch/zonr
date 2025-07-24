@@ -9,12 +9,14 @@ import type { GameState, ScoreCategories, ScoreEntry } from '../types';
 
 interface GameLayoutProps {
   gameState: GameState;
-  onUpdateScore: (category: keyof ScoreCategories, delta: number) => void;
-  onSetScore: (category: keyof ScoreCategories, score: number) => void;
-  onAddScore: () => void;
+  onUpdatePoints: (delta: number) => void;
+  onSetPoints: (points: number) => void;
+  onSelectCategory: (category: keyof ScoreCategories | 'other') => void;
+  onAddToTurn: () => void;
+  onRemoveFromTurn: (entryId: string) => void;
+  onFinishTurn: () => void;
   onSelectPlayer: (playerIndex: number) => void;
   onEditScore: (entry: ScoreEntry) => void;
-  getCurrentTotal: () => number;
   onRestartGame: () => void;
   onNewGame: () => void;
   onEndGame: () => void;
@@ -22,12 +24,14 @@ interface GameLayoutProps {
 
 export const GameLayout: React.FC<GameLayoutProps> = ({
   gameState,
-  onUpdateScore,
-  onSetScore,
-  onAddScore,
+  onUpdatePoints,
+  onSetPoints,
+  onSelectCategory,
+  onAddToTurn,
+  onRemoveFromTurn,
+  onFinishTurn,
   onSelectPlayer,
   onEditScore,
-  getCurrentTotal,
   onRestartGame,
   onNewGame,
   onEndGame
@@ -56,12 +60,17 @@ export const GameLayout: React.FC<GameLayoutProps> = ({
           <div className="p-2">
             <div className="max-w-2xl mx-auto">
               <ScoreInputSection
-                currentScores={gameState.currentScores}
-                activePlayerName={gameState.getActivePlayer()?.getPlayerName()}
-                onUpdateScore={onUpdateScore}
-                onSetScore={onSetScore}
-                onAddScore={onAddScore}
-                getCurrentTotal={getCurrentTotal}
+                currentPoints={gameState.currentPoints}
+                selectedCategory={gameState.selectedCategory}
+                turnEntries={gameState.turnState.entries}
+                turnTotal={gameState.turnState.total}
+                activePlayerName={gameState.getActivePlayer()?.getPlayerName() || 'Player'}
+                onUpdatePoints={onUpdatePoints}
+                onSetPoints={onSetPoints}
+                onSelectCategory={onSelectCategory}
+                onAddToTurn={onAddToTurn}
+                onRemoveFromTurn={onRemoveFromTurn}
+                onFinishTurn={onFinishTurn}
               />
 
               <ScoreHistorySection

@@ -13,6 +13,20 @@ export interface ScoreEntry {
   id: string;
 }
 
+// New types for turn building
+export interface TurnEntry {
+  id: string;
+  category: keyof ScoreCategories | 'other';
+  points: number;
+  categoryName: string;
+  categoryIcon: string;
+}
+
+export interface TurnState {
+  entries: TurnEntry[];
+  total: number;
+}
+
 export class Player {
   id: number;
   name: string;
@@ -61,17 +75,27 @@ export class GameState {
   activePlayer: number;
   currentScores: ScoreCategories;
   turn: number;
+  // New properties for turn building
+  currentPoints: number;
+  selectedCategory: keyof ScoreCategories | 'other';
+  turnState: TurnState;
 
   constructor(
     players: Player[],
     activePlayer: number,
     currentScores: ScoreCategories,
-    turn: number
+    turn: number,
+    currentPoints: number = 0,
+    selectedCategory: keyof ScoreCategories | 'other' = 'other',
+    turnState: TurnState = { entries: [], total: 0 }
   ) {
     this.players = players;
     this.activePlayer = activePlayer;
     this.currentScores = currentScores;
     this.turn = turn;
+    this.currentPoints = currentPoints;
+    this.selectedCategory = selectedCategory;
+    this.turnState = turnState;
   }
 
   getActivePlayer(): Player {
@@ -80,7 +104,7 @@ export class GameState {
 }
 
 export interface ScoreCategory {
-  key: keyof ScoreCategories;
+  key: keyof ScoreCategories | 'other';
   label: string;
   icon: string;
 }

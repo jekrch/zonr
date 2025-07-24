@@ -14,9 +14,12 @@ const CarcassonneTracker: React.FC = () => {
     showSetup,
     setShowSetup,
     createGame,
-    updateCurrentScore,
-    getCurrentTotal,
-    addScore,
+    updateCurrentPoints,
+    setCurrentPoints,
+    selectCategory,
+    addToTurn,
+    removeFromTurn,
+    finishTurn,
     selectPlayer,
     saveEditedScore,
     restartGame, 
@@ -45,12 +48,6 @@ const CarcassonneTracker: React.FC = () => {
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, [gameState.players.length]);
-
-  const handleSetScore = (category: keyof ScoreCategories, score: number): void => {
-    const currentScore = gameState.currentScores[category];
-    const delta = score - currentScore;
-    updateCurrentScore(category, delta);
-  };
 
   const handleEditScore = (entry: ScoreEntry): void => {
     setEditingEntry(entry);
@@ -106,12 +103,14 @@ const CarcassonneTracker: React.FC = () => {
       />
       <GameLayout
         gameState={gameState}
-        onUpdateScore={updateCurrentScore}
-        onSetScore={handleSetScore}
-        onAddScore={addScore}
+        onUpdatePoints={updateCurrentPoints}
+        onSetPoints={setCurrentPoints}
+        onSelectCategory={selectCategory}
+        onAddToTurn={addToTurn}
+        onRemoveFromTurn={removeFromTurn}
+        onFinishTurn={finishTurn}
         onSelectPlayer={selectPlayer}
         onEditScore={handleEditScore}
-        getCurrentTotal={getCurrentTotal}
         onRestartGame={restartGame}
         onNewGame={startNewGame}
         onEndGame={handleEndGame}

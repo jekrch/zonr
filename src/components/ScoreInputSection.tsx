@@ -1,56 +1,77 @@
 import React from 'react';
-import { ScoreInputCategory } from './ScoreInputCategory';
-import type { ScoreCategories, ScoreCategory } from '../types';
+import { PointEntrySection } from './PointEntrySection';
+import { CategorySelectionSection } from './CategorySelectionSection';
+import { TurnSummarySection } from './TurnSummarySection';
+import type { ScoreCategories, TurnEntry } from '../types';
 
 interface ScoreInputSectionProps {
-  currentScores: ScoreCategories;
+  currentPoints: number;
+  selectedCategory: keyof ScoreCategories | 'other';
+  turnEntries: TurnEntry[];
+  turnTotal: number;
   activePlayerName: string;
-  onUpdateScore: (category: keyof ScoreCategories, delta: number) => void;
-  onSetScore?: (category: keyof ScoreCategories, score: number) => void;
-  onAddScore: () => void;
-  getCurrentTotal: () => number;
+  onUpdatePoints: (delta: number) => void;
+  onSetPoints: (points: number) => void;
+  onSelectCategory: (category: keyof ScoreCategories | 'other') => void;
+  onAddToTurn: () => void;
+  onRemoveFromTurn: (entryId: string) => void;
+  onFinishTurn: () => void;
 }
 
-const scoreCategories: ScoreCategory[] = [
-  { key: 'roads', label: 'Roads', icon: '🛤️' },
-  { key: 'cities', label: 'Cities', icon: '🏰' },
-  { key: 'monasteries', label: 'Monasteries', icon: '⛪' },
-  { key: 'fields', label: 'Fields', icon: '🌾' }
-];
-
 export const ScoreInputSection: React.FC<ScoreInputSectionProps> = ({
-  currentScores,
+  currentPoints,
+  selectedCategory,
+  turnEntries,
+  turnTotal,
   activePlayerName,
-  onUpdateScore,
-  onSetScore,
-  onAddScore,
-  getCurrentTotal
+  onUpdatePoints,
+  onSetPoints,
+  onSelectCategory,
+  onAddToTurn,
+  onRemoveFromTurn,
+  onFinishTurn
 }) => {
+  const canAddToTurn = currentPoints !== 0;
+
   return (
     <div className="bg-znr-secondary rounded-xl md:rounded-2xl p-3 md:p-6 mb-3 md:mb-4 shadow-xl select-none">
-      {scoreCategories.map(category => (
-        <ScoreInputCategory
-          key={category.key}
-          category={category}
-          currentScore={currentScores[category.key]}
-          onUpdateScore={onUpdateScore}
-          onSetScore={onSetScore}
-        />
-      ))}
+      {/* Point Entry */}
+      <PointEntrySection
+        currentPoints={currentPoints}
+        onUpdatePoints={onUpdatePoints}
+        onSetPoints={onSetPoints}
+      />
 
-      {/* Turn Total */}
-      <div className="text-center py-4 md:py-6 my-3 md:my-4 relative">
-        <div className="absolute left-[15%] right-[15%] top-0 h-px bg-gradient-to-r from-transparent via-znr-hover to-transparent" />
-        <div className="text-xs uppercase tracking-wider text-znr-text-muted mb-1 md:mb-2">Turn Total</div>
-        <div className="text-3xl md:text-5xl font-extralight text-znr-text-accent drop-shadow-lg">
-          {getCurrentTotal()}
-        </div>
-      </div>
+      {/* Category Selection */}
+      <CategorySelectionSection
+        selectedCategory={selectedCategory}
+        onSelectCategory={onSelectCategory}
+      />
 
-      {/* Add Score Button */}
+      {/* Add to Turn Button */}
       <button
-        onClick={onAddScore}
-        className="w-full py-3 md:py-5 bg-gradient-to-r from-znr-accent-alt to-znr-accent rounded-lg md:rounded-2xl text-znr-text font-semibold text-sm md:text-base uppercase tracking-wide hover:-translate-y-1 transition-all shadow-lg hover:shadow-xl active:scale-[0.98] touch-manipulation"
+        onClick={onAddToTurn}
+        disabled={!canAddToTurn}
+        className={`w-full py-3 rounded-lg font-semibold text-sm md:text-base transition-colors touch-manipulation mb-4 ${
+          canAddToTurn
+            ? 'bg-znr-elevated text-znr-text hover:bg-znr-hover'
+            : 'bg-znr-elevated text-znr-text-muted cursor-not-allowed opacity-50'
+        }`}
+      >
+        Add to Turn
+      </button>
+
+      {/* Turn Summary */}
+      <TurnSummarySection
+        entries={turnEntries}
+        turnTotal={turnTotal}
+        onRemoveEntry={onRemoveFromTurn}
+      />
+
+      {/* Finish Turn Button - Always available */}
+      <button
+        onClick={onFinishTurn}
+        className="w-full py-4 md:py-5 rounded-lg md:rounded-2xl font-semibold text-sm md:text-base uppercase tracking-wide transition-all touch-manipulation bg-gradient-to-r from-znr-accent-alt to-znr-accent text-znr-text-dark shadow-lg hover:shadow-xl hover:-translate-y-1"
       >
         Finish {activePlayerName}'s Turn
       </button>
