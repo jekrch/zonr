@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Settings, X, Palette, Info, Github, ExternalLink, RotateCcw, Plus, AlertTriangle, Trophy } from 'lucide-react';
 import { updateThemeInURL, clearGameFromURL, loadGameStateFromURL } from '../gameStateUtils';
 import Portal from '@/Portal';
+import type { Player } from '@/types';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -258,7 +259,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                   <div className="space-y-2 text-sm text-znr-text-muted">
                     <div className="flex justify-between items-center">
                       <span>Version</span>
-                      <span className="text-znr-text">1.3</span>
+                      <span className="text-znr-text">2.0</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span>Built with</span>
@@ -409,7 +410,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                       <div className="flex justify-between text-znr-text-muted">
                         <span>Active Player</span>
                         <span className="text-znr-text">
-                          {gameState?.players[gameState.activePlayer]?.name || 'Unknown'}
+                          {gameState?.players.find((p: Player) => p.id === gameState.activePlayer)?.getPlayerName() || 'Unknown'}
                         </span>
                       </div>
                     </div>
