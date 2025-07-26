@@ -47,7 +47,6 @@ export const EndGameModal: React.FC<EndGameModalProps> = ({
     });
   }, []);
 
-
   // Enhanced fireworks configuration based on the CodePen example
   const fireworksOptions: ISourceOptions = useMemo(
     () => ({
@@ -274,15 +273,21 @@ export const EndGameModal: React.FC<EndGameModalProps> = ({
     []
   );
 
-  // Calculate winner and game stats
-  const winner = gameState.players.reduce((prev, current) => 
-    current.totalScore > prev.totalScore ? current : prev
-  );
+  // Calculate winners (plural) and game stats
+  const highestScore = Math.max(...gameState.players.map(p => p.totalScore));
+  const winners = gameState.players.filter(p => p.totalScore === highestScore);
+  const isTie = winners.length > 1;
   
-  const sortedPlayers = [...gameState.players].sort((a, b) => b.totalScore - a.totalScore);
+  // Sort players: winners first, then others by score descending
+  const sortedPlayers = [...gameState.players].sort((a, b) => {
+    if (a.totalScore === highestScore && b.totalScore === highestScore) return 0; // Winners stay in original order
+    if (a.totalScore === highestScore) return -1; // Winner comes first
+    if (b.totalScore === highestScore) return 1;  // Winner comes first
+    return b.totalScore - a.totalScore; // Others sorted by score descending
+  });
   
-  // Get all losing players (everyone except the winner)
-  const losingPlayers = sortedPlayers.slice(1);
+  // Get all non-winning players
+  const nonWinners = sortedPlayers.filter(p => p.totalScore < highestScore);
   
   const gameStats = {
     totalTurns: Math.max(1, ...gameState.players.map(p => p.history.length)),
@@ -314,7 +319,7 @@ export const EndGameModal: React.FC<EndGameModalProps> = ({
   };
 
   // Calculate individual player breakdowns
-  const playerBreakdowns = sortedPlayers.map(player => {
+  const playerBreakdowns = sortedPlayers.map((player, index) => {
     const breakdown = player.history.reduce((acc, entry) => {
       acc.roads += entry.scores.roads || 0;
       acc.cities += entry.scores.cities || 0;
@@ -324,7 +329,16 @@ export const EndGameModal: React.FC<EndGameModalProps> = ({
       return acc;
     }, { roads: 0, cities: 0, monasteries: 0, fields: 0, other: 0 });
     
-    return { ...player, breakdown };
+    // Determine position text
+    let position;
+    if (player.totalScore === highestScore) {
+      position = isTie ? 'T1' : '1';
+    } else {
+      const playersAhead = sortedPlayers.filter(p => p.totalScore > player.totalScore).length;
+      position = (playersAhead + 1).toString();
+    }
+    
+    return { ...player, breakdown, position };
   });
 
   useEffect(() => {
@@ -347,7 +361,7 @@ export const EndGameModal: React.FC<EndGameModalProps> = ({
     }
   }, [isOpen]);
 
-const handleShare = async () => {
+  const handleShare = async () => {
     // Get the current URL parameters
     const currentUrl = new URL(window.location.href);
     
@@ -368,11 +382,15 @@ const handleShare = async () => {
     }   
     const shareUrl = currentUrl.toString();
     
+    const shareText = isTie 
+      ? `Tie game! ${winners.map(w => w.getPlayerName()).join(' & ')} tied with ${highestScore} points!`
+      : `${winners[0].getPlayerName()} won with ${highestScore} points!`;
+    
     if (navigator.share) {
       try {
         await navigator.share({
           title: 'Carcassonne Game Results',
-          text: `${winner.getPlayerName()} won with ${winner.totalScore} points!`,
+          text: shareText,
           url: shareUrl
         });
       } catch (err) {
@@ -399,7 +417,6 @@ const handleShare = async () => {
       {particlesInit && animationPhase === 'visible' && (
         <Particles
           id="fireworks"
-          //particlesLoaded={particlesLoaded}
           className="absolute inset-0 pointer-events-none"
           options={fireworksOptions}
         />
@@ -415,7 +432,6 @@ const handleShare = async () => {
             <ArrowLeft size={16} />
             Back to Game
           </button>
-          
           
           <div className="flex gap-2">
             <button
@@ -435,74 +451,114 @@ const handleShare = async () => {
 
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto znr-scroll-enhanced">
-          {/* Compact Winner Celebration Section */}
+          {/* Winner/Tie Celebration Section */}
           <div className="p-6">
-            <div className="flex items-center justify-center gap-12 mb-6">
-              {/* Losing Players - Left Side Only */}
-              <div className="flex flex-col gap-4">
-                {losingPlayers.map((player, index) => (
-                  <div 
-                    key={`losing-${player.id}`}
-                    className={`flex items-center gap-3 transition-all duration-700 gentle-sway ${
-                      animationPhase === 'visible' ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'
-                    }`}
-                    style={{ 
-                      transitionDelay: `${index * 200 + 500}ms`,
-                      animationDelay: `${index * 0.5}s`
-                    }}
-                  >
-                    <div className="text-znr-text-muted font-bold text-lg min-w-[2rem] text-center">#{index + 2}</div>
-                    <div className="w-8 h-8 flex-shrink-0">
-                      <Meeple color={player.color} className="w-full h-full opacity-80" />
-                    </div>
-                    <div className="text-left">
-                      <div className="text-znr-text text-base font-semibold">{player.name}</div>
-                      <div className="text-znr-text-muted text-sm font-medium">{player.totalScore} pts</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+            <div className="flex items-center justify-center gap-8 mb-6">
+              {/* Non-winners - Left Side */}
+              {nonWinners.length > 0 && (
+                <div className="flex flex-col gap-4">
+                  {nonWinners.map((player, index) => {
+                    const playerData = playerBreakdowns.find(p => p.id === player.id);
+                    return (
+                      <div 
+                        key={`non-winner-${player.id}`}
+                        className={`flex items-center gap-3 transition-all duration-700 gentle-sway ${
+                          animationPhase === 'visible' ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'
+                        }`}
+                        style={{ 
+                          transitionDelay: `${index * 200 + 500}ms`,
+                          animationDelay: `${index * 0.5}s`
+                        }}
+                      >
+                        <div className="text-znr-text-muted font-bold text-lg min-w-[2rem] text-center">#{playerData?.position}</div>
+                        <div className="w-8 h-8 flex-shrink-0">
+                          <Meeple color={player.color} className="w-full h-full opacity-80" />
+                        </div>
+                        <div className="text-left">
+                          <div className="text-znr-text text-base font-semibold">{player.name}</div>
+                          <div className="text-znr-text-muted text-sm font-medium">{player.totalScore} pts</div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
 
-              {/* Winner - Center */}
+              {/* Winners - Center */}
               <div className="text-center relative">
-                {/* Floating Crown */}
+                {/* Crown(s) */}
                 <div className={`text-5xl mb-1 transition-all duration-1000 floating-crown ${
                   animationPhase === 'visible' ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
                 }`}>
-                  👑
+                  {isTie ? '👑👑' : '👑'}
                 </div>
 
-                {/* Dancing Winner Meeple */}
+                {/* Winner Meeples */}
                 <div className="relative mb-0">
-                  <div className={`w-18 h-18 mx-auto transition-all duration-1000 dancing-winner ${
-                    animationPhase === 'visible' ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
-                  }`}>
-                    <Meeple color={winner.color} className="w-full h-full drop-shadow-2xl" />
-                  </div>
-                  
-                  {/* Floating Trophy */}
-                  <div className={`absolute -top-3 -right-3 transition-all duration-1000 gentle-float ${
-                    animationPhase === 'visible' ? 'opacity-100 scale-100' : 'opacity-0 scale-0'
-                  }`} style={{ animationDelay: '0.5s' }}>
-                    <div className="w-10 h-10 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center shadow-lg">
-                      <Trophy size={16} className="text-yellow-900" />
+                  {isTie ? (
+                    /* Multiple Winners Layout */
+                    <div className={`flex justify-center items-end gap-3 transition-all duration-1000 dancing-winner ${
+                      animationPhase === 'visible' ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
+                    }`}>
+                      {winners.map((winner, index) => (
+                        <div key={winner.id} className="relative">
+                          <div className="w-16 h-16">
+                            <Meeple color={winner.color} className="w-full h-full drop-shadow-2xl" />
+                          </div>
+                          {/* Individual Trophy for each winner */}
+                          <div className={`absolute -top-2 -right-2 transition-all duration-1000 gentle-float ${
+                            animationPhase === 'visible' ? 'opacity-100 scale-100' : 'opacity-0 scale-0'
+                          }`} style={{ animationDelay: `${0.5 + index * 0.2}s` }}>
+                            <div className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center shadow-lg">
+                              <Trophy size={12} className="text-yellow-900" />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  </div>
+                  ) : (
+                    /* Single Winner Layout */
+                    <div className={`w-18 h-18 mx-auto transition-all duration-1000 dancing-winner ${
+                      animationPhase === 'visible' ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
+                    }`}>
+                      <Meeple color={winners[0].color} className="w-full h-full drop-shadow-2xl" />
+                      
+                      {/* Floating Trophy */}
+                      <div className={`absolute -top-3 -right-3 transition-all duration-1000 gentle-float ${
+                        animationPhase === 'visible' ? 'opacity-100 scale-100' : 'opacity-0 scale-0'
+                      }`} style={{ animationDelay: '0.5s' }}>
+                        <div className="w-10 h-10 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center shadow-lg">
+                          <Trophy size={16} className="text-yellow-900" />
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Winner Text */}
                 <div className={`space-y-3 transition-all duration-1000 ${
                   animationPhase === 'visible' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
                 }`} style={{ transitionDelay: '300ms' }}>
-                  <h3 className="text-4xl font-bold text-znr-text">
-                    {winner.name} Wins!
+                  <h3 className="text-2xl font-bold text-znr-text">
+                    {isTie ? (
+                      winners.length === 2 ? 
+                        `${winners[0].getPlayerName()} & ${winners[1].getPlayerName()} Tie!` :
+                        `${winners.length}-Way Tie!`
+                    ) : (
+                      `${winners[0].name} Wins!`
+                    )}
                   </h3>
                   <div className="ml-4">
-                  <span className="text-4xl font-bold bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 bg-clip-text text-transparent mr-2">
-                    {winner.totalScore}
-                  </span>
-                  <span className="text-znr-text-muted text-lg">pts</span>
-                </div>
+                    <span className="text-4xl font-bold bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 bg-clip-text text-transparent mr-2">
+                      {highestScore}
+                    </span>
+                    <span className="text-znr-text-muted text-lg">pts</span>
+                  </div>
+                  {isTie && (
+                    <div className="text-sm text-znr-text-muted mt-2">
+                      Shared Victory in Carcassonne!
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -556,24 +612,42 @@ const handleShare = async () => {
                     key={player.id} 
                     className={`bg-znr-elevated/50 rounded-xl p-4 transition-all duration-500 ${
                       visibleStats > 0 ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
-                    }`}
+                    } ${player.totalScore === highestScore ? 'ring-2 ring-yellow-400/30 bg-yellow-500/5' : ''}`}
                     style={{ transitionDelay: `${(playerIndex + 1) * 150}ms` }}
                   >
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-3">
-                        <div className="text-znr-text-muted font-bold w-6 text-sm">#{playerIndex + 1}</div>
+                        <div className={`font-bold w-8 text-sm text-center ${
+                          player.totalScore === highestScore ? 'text-yellow-400' : 'text-znr-text-muted'
+                        }`}>
+                          #{player.position}
+                        </div>
                         <div className="w-8 h-8">
                           <Meeple color={player.color} className="w-full h-full" />
                         </div>
                         <div>
-                          <span className="text-znr-text font-semibold">{player.name}</span>
+                          <span className={`font-semibold ${
+                            player.totalScore === highestScore ? 'text-yellow-300' : 'text-znr-text'
+                          }`}>
+                            {player.name}
+                            {player.totalScore === highestScore && isTie && (
+                              <span className="text-xs text-yellow-400 ml-2">👑 WINNER</span>
+                            )}
+                            {player.totalScore === highestScore && !isTie && (
+                              <span className="text-xs text-yellow-400 ml-2">👑 WINNER</span>
+                            )}
+                          </span>
                           <div className="text-znr-text-muted text-xs">{player.history.length} turns</div>
                         </div>
                       </div>
-                      <div className="text-xl font-bold text-znr-text">{player.totalScore}</div>
+                      <div className={`text-xl font-bold ${
+                        player.totalScore === highestScore ? 'text-yellow-300' : 'text-znr-text'
+                      }`}>
+                        {player.totalScore}
+                      </div>
                     </div>
                     
-                    {/* Category Breakdown - Now includes "Any" */}
+                    {/* Category Breakdown */}
                     <div className="grid grid-cols-5 gap-2">
                       {scoreCategories.map(category => (
                         <div key={category.key} className="bg-znr-secondary/50 rounded-lg p-2 text-center">

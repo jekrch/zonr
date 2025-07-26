@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ScoreDot } from './ScoreDot';
 import { useScorePositions } from '../hooks/useScorePositions';
+import { useAnimatedScorePositions } from '../hooks/useAnimatedScorePositions';
 import { useDimensions } from '../hooks/useDimensions';
 import type { Player } from '../types';
 
@@ -10,6 +11,7 @@ interface ScoreTrackBorderProps {
 
 export const ScoreTrackBorder: React.FC<ScoreTrackBorderProps> = ({ players }) => {
   const { getScorePosition } = useScorePositions();
+  const { getAnimatedPosition } = useAnimatedScorePositions(players);
   const { windowDimensions } = useDimensions();
   const [isTrackReady, setIsTrackReady] = useState(false);
 
@@ -132,10 +134,10 @@ export const ScoreTrackBorder: React.FC<ScoreTrackBorderProps> = ({ players }) =
         })}
       </div>
 
-      {/* Player score dots - only render when ready */}
+      {/* Player score dots - now using animated positions */}
       {players.map(player => {
         try {
-          const position = getScorePosition(player.totalScore);
+          const position = getAnimatedPosition(player.id);
           
           // Validate position before rendering
           if (!position || isNaN(position.x) || isNaN(position.y)) {

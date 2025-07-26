@@ -11,7 +11,7 @@ export const ScoreDot: React.FC<ScoreDotProps> = ({ player, position }) => {
   
   return (
     <div 
-      className="absolute w-3 h-3 md:w-4 md:h-4 transition-all duration-500 ease-in-out"
+      className="absolute w-3 h-3 md:w-4 md:h-4"
       style={{ 
         left: `${position.x}px`, 
         top: `${position.y}px`,
