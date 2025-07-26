@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Edit3, StepBack as Backspace, Check, X } from 'lucide-react';
 
 interface PointEntrySectionProps {

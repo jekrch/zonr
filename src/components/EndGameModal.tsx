@@ -319,7 +319,7 @@ export const EndGameModal: React.FC<EndGameModalProps> = ({
   };
 
   // Calculate individual player breakdowns
-  const playerBreakdowns = sortedPlayers.map((player, index) => {
+  const playerBreakdowns = sortedPlayers.map((player) => {
     const breakdown = player.history.reduce((acc, entry) => {
       acc.roads += entry.scores.roads || 0;
       acc.cities += entry.scores.cities || 0;
