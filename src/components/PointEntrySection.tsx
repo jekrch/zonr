@@ -78,19 +78,19 @@ export const PointEntrySection: React.FC<PointEntrySectionProps> = ({
       {/* Expanding Number Pad */}
       <div 
         className={`overflow-hidden transition-all duration-300 ease-out ${
-          showNumberPad ? 'max-h-96 opacity-100 mb-4' : 'max-h-0 opacity-0'
+          showNumberPad ? 'max-h-96 opacity-100 mb-6 ' : 'max-h-0 opacity-0'
         }`}
         onKeyDown={handleKeyDown}
         tabIndex={-1}
       >
-        <div className="bg-znr-elevated rounded-xl p-3 border border-[var(--znr-text-dim)]/40 shadow-lg backdrop-blur-sm">
+        <div className="bg-znr-elevated rounded-xl p-3 border border-[var(--znr-text-dim)]/10 shadow-lg backdrop-blur-sm">
           {/* Number Grid */}
           <div className="grid grid-cols-3 gap-1.5 mb-2">
             {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
               <button
                 key={num}
                 onClick={() => handleNumberClick(num.toString())}
-                className="h-10 bg-znr-secondary border border-znr-border rounded-lg text-znr-text font-medium hover:bg-znr-hover hover:border-znr-accent/30 transition-all  touch-manipulation text-sm"
+                className="h-10 bg-znr-tertiary border border-znr-border rounded-lg text-znr-text font-medium transition-all touch-manipulation text-sm active:!bg-[var(--znr-secondary)] hover:!bg-[var(--znr-secondary)]/80"
               >
                 {num}
               </button>
@@ -107,7 +107,7 @@ export const PointEntrySection: React.FC<PointEntrySectionProps> = ({
             </button>
             <button
               onClick={() => handleNumberClick('0')}
-              className="h-10 bg-znr-secondary border border-znr-border rounded-lg text-znr-text font-medium hover:bg-znr-hover hover:border-znr-accent/30 transition-all  touch-manipulation text-sm"
+              className="h-10 bg-znr-tertiary border border-znr-border rounded-lg text-znr-text font-medium hover:bg-znr-hover hover:border-znr-accent/30 transition-all  touch-manipulation text-sm"
             >
               0
             </button>
