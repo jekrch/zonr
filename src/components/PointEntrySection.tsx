@@ -28,17 +28,21 @@ export const PointEntrySection: React.FC<PointEntrySectionProps> = ({
 
   const activePlayerColor = gameState?.getActivePlayer()?.color;
   const lastColorRef = useRef(activePlayerColor);
+  const isAnimatingRef = useRef(false);
 
   // Handle meeple color changes with flip animation
   useEffect(() => {
-    // Only animate if color actually changed
-    if (activePlayerColor && activePlayerColor !== lastColorRef.current) {
+
+    // Only animate if color actually changed and we're not already animating
+    if (activePlayerColor && 
+        activePlayerColor !== lastColorRef.current && 
+        !isAnimatingRef.current) {
+      
+      // Immediately mark as animating and update ref to prevent double triggers
+      isAnimatingRef.current = true;
       lastColorRef.current = activePlayerColor;
       
-      // Don't start new animation if already flipping
-      if (isFlipping) return;
-      
-      // Set up the new color on the back face
+      // Set up the new color on the hidden face
       if (isFlipped) {
         setFrontColor(activePlayerColor);
       } else {
@@ -56,6 +60,7 @@ export const PointEntrySection: React.FC<PointEntrySectionProps> = ({
         // End flip animation
         setTimeout(() => {
           setIsFlipping(false);
+          isAnimatingRef.current = false; // Reset animation flag
         }, 300);
       }, 150);
     }
@@ -120,7 +125,7 @@ export const PointEntrySection: React.FC<PointEntrySectionProps> = ({
                    style={{
                      transformStyle: 'preserve-3d',
                      transform: `rotateY(${
-                       (isFlipped ? 180 : 0) + (isFlipping ? 180 : 0)
+                       (isFlipped ? 180 : 0)
                      }deg) ${isFlipping ? 'rotateY(-10deg) translateY(-2px)' : 'translateY(0px)'}`,
                      transitionTimingFunction: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)'
                    }}
@@ -172,7 +177,7 @@ export const PointEntrySection: React.FC<PointEntrySectionProps> = ({
                     style={{
                       transformStyle: 'preserve-3d',
                       transform: `rotateY(${
-                        (isFlipped ? 180 : 0) + (isFlipping ? 180 : 0)
+                        (isFlipped ? 180 : 0) 
                       }deg) ${isFlipping ? 'rotateY(10deg) translateY(-2px)' : 'translateY(0px)'}`,
                       transitionTimingFunction: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)'
                     }}
