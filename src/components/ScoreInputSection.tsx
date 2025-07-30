@@ -2,7 +2,7 @@ import React from 'react';
 import { PointEntrySection } from './PointEntrySection';
 import { CategorySelectionSection } from './CategorySelectionSection';
 import { TurnSummarySection } from './TurnSummarySection';
-import type { ScoreCategories, TurnEntry } from '../types';
+import type { GameState, ScoreCategories, TurnEntry } from '../types';
 
 interface ScoreInputSectionProps {
   currentPoints: number;
@@ -10,6 +10,7 @@ interface ScoreInputSectionProps {
   turnEntries: TurnEntry[];
   turnTotal: number;
   activePlayerName: string;
+  gameState: GameState;
   onUpdatePoints: (delta: number) => void;
   onSetPoints: (points: number) => void;
   onSelectCategory: (category: keyof ScoreCategories | 'other') => void;
@@ -24,6 +25,7 @@ export const ScoreInputSection: React.FC<ScoreInputSectionProps> = ({
   turnEntries,
   turnTotal,
   activePlayerName,
+  gameState,
   onUpdatePoints,
   onSetPoints,
   onSelectCategory,
@@ -40,6 +42,7 @@ export const ScoreInputSection: React.FC<ScoreInputSectionProps> = ({
         currentPoints={currentPoints}
         onUpdatePoints={onUpdatePoints}
         onSetPoints={onSetPoints}
+        gameState={gameState}
       />
 
       {/* Category Selection */}

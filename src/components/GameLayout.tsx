@@ -64,6 +64,7 @@ export const GameLayout: React.FC<GameLayoutProps> = ({
                 selectedCategory={gameState.selectedCategory}
                 turnEntries={gameState.turnState.entries}
                 turnTotal={gameState.turnState.total}
+                gameState={gameState}
                 activePlayerName={gameState.getActivePlayer()?.getPlayerName() || 'Player'}
                 onUpdatePoints={onUpdatePoints}
                 onSetPoints={onSetPoints}
