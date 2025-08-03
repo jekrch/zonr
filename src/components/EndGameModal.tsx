@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { X, Trophy, Target, TrendingUp, Users, Clock, Share2, ArrowLeft, RotateCcw, Plus, Star, Zap } from 'lucide-react';
+import { X, Trophy, Target, TrendingUp, Users, Clock, Share2, ArrowLeft, RotateCcw, Plus, Star } from 'lucide-react';
 import { Meeple } from './Meeple';
 import type { GameState } from '../types';
 import Particles, { initParticlesEngine } from "@tsparticles/react";
@@ -517,7 +517,7 @@ export const EndGameModal: React.FC<EndGameModalProps> = ({
         {/* Non-winners - Left Side */}
         {nonWinners.length > 0 && (
           <div className="flex flex-col gap-4">
-            {nonWinners.map((player, index) => {
+            {nonWinners.map((player) => {
               const playerData = playerBreakdowns.find(p => p.id === player.id);
               return (
                 <div 
@@ -775,7 +775,7 @@ export const EndGameModal: React.FC<EndGameModalProps> = ({
                   </div>
                 ) : (
                   /* Multiplayer Breakdowns */
-                  playerBreakdowns.map((player, playerIndex) => (
+                  playerBreakdowns.map((player) => (
                     <div 
                       key={player.id} 
                       className={`bg-znr-elevated/50 rounded-xl p-4 transition-all duration-800 ${
