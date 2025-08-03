@@ -19,7 +19,7 @@ interface GameLayoutProps {
   onEditScore: (entry: ScoreEntry) => void;
   onRestartGame: () => void;
   onNewGame: () => void;
-  onEndGame: () => void;
+  onEndGame: (playerWon?: boolean) => void;
 }
 
 export const GameLayout: React.FC<GameLayoutProps> = ({

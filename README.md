@@ -1,7 +1,7 @@
 # Zonr :european_castle:
 
 
-![Version](https://img.shields.io/badge/version-2.0-blue) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![Version](https://img.shields.io/badge/version-3.0-blue) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 <a href="https://jekrch.github.io/zonr">jekrch.github.io/zonr/</a>
 
@@ -9,7 +9,8 @@ A clean, modern score tracking app for the board game Carcassonne. Keep track of
 
 ## Features
 
-- **Multi-player support** - Track scores for 2-6 players with customizable names and meeple colors
+- **Multi-player & Single Player Modes** - Track scores for 2-6 players on a single device, or use the new **Single Player** mode where each player can track their own score on their own device.
+
 - **Complete scoring system** - Roads, cities, monasteries, and fields with increment/decrement controls and manual input
 - **Game sharing** - Share games via URL with full state persistence - no accounts needed
 - **Score history** - View complete turn history and edit individual scoring rounds

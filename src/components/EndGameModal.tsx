@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { X, Trophy, Target, TrendingUp, Users, Clock, Share2, ArrowLeft, RotateCcw, Plus } from 'lucide-react';
+import { X, Trophy, Target, TrendingUp, Users, Clock, Share2, ArrowLeft, RotateCcw, Plus, Star, Zap } from 'lucide-react';
 import { Meeple } from './Meeple';
 import type { GameState } from '../types';
 import Particles, { initParticlesEngine } from "@tsparticles/react";
@@ -10,6 +10,7 @@ import { loadAll } from "@tsparticles/all";
 
 interface EndGameModalProps {
   isOpen: boolean;
+  playerWon?: boolean;
   onClose: () => void;
   onBackToGame: () => void;
   onRestartGame: () => void;
@@ -27,6 +28,7 @@ const scoreCategories = [
 
 export const EndGameModal: React.FC<EndGameModalProps> = ({ 
   isOpen, 
+  playerWon,
   onClose, 
   onBackToGame,
   onRestartGame,
@@ -36,6 +38,10 @@ export const EndGameModal: React.FC<EndGameModalProps> = ({
   const [animationPhase, setAnimationPhase] = useState<'hidden' | 'visible'>('hidden');
   const [visibleStats, setVisibleStats] = useState<number>(0);
   const [particlesInit, setParticlesInit] = useState(false);
+
+  // Check if this is a single player game
+  const isSinglePlayer = gameState.players.length === 1;
+  const singlePlayer = isSinglePlayer ? gameState.players[0] : null;
 
   // Initialize tsParticles engine with full features
   useEffect(() => {
@@ -47,7 +53,7 @@ export const EndGameModal: React.FC<EndGameModalProps> = ({
     });
   }, []);
 
-  // Enhanced fireworks configuration based on the CodePen example
+  // Enhanced fireworks configuration - only for wins
   const fireworksOptions: ISourceOptions = useMemo(
     () => ({
       background: {
@@ -180,7 +186,11 @@ export const EndGameModal: React.FC<EndGameModalProps> = ({
                 width: 0
               },
               color: {
-                value: ["#ff595e", "#ffca3a", "#8ac926", "#1982c4", "#6a4c93", "#ff4757", "#2ed573", "#3742fa", "#ffa502"]
+                value: isSinglePlayer && playerWon 
+                  ? ["#ff595e", "#ffca3a", "#8ac926", "#1982c4", "#6a4c93", "#ff4757", "#2ed573", "#3742fa", "#ffa502"]
+                  : isSinglePlayer && !playerWon
+                  ? ["#64748b", "#94a3b8", "#cbd5e1", "#e2e8f0"] // Muted colors for loss
+                  : ["#ff595e", "#ffca3a", "#8ac926", "#1982c4", "#6a4c93", "#ff4757", "#2ed573", "#3742fa", "#ffa502"]
               },
               number: {
                 value: 0
@@ -270,23 +280,22 @@ export const EndGameModal: React.FC<EndGameModalProps> = ({
         }
       }
     }),
-    []
+    [isSinglePlayer, playerWon]
   );
 
-  // Calculate winners (plural) and game stats
+  // Calculate winners (plural) and game stats for multiplayer
   const highestScore = Math.max(...gameState.players.map(p => p.totalScore));
   const winners = gameState.players.filter(p => p.totalScore === highestScore);
   const isTie = winners.length > 1;
   
   // Sort players: winners first, then others by score descending
   const sortedPlayers = [...gameState.players].sort((a, b) => {
-    if (a.totalScore === highestScore && b.totalScore === highestScore) return 0; // Winners stay in original order
-    if (a.totalScore === highestScore) return -1; // Winner comes first
-    if (b.totalScore === highestScore) return 1;  // Winner comes first
-    return b.totalScore - a.totalScore; // Others sorted by score descending
+    if (a.totalScore === highestScore && b.totalScore === highestScore) return 0;
+    if (a.totalScore === highestScore) return -1;
+    if (b.totalScore === highestScore) return 1;
+    return b.totalScore - a.totalScore;
   });
   
-  // Get all non-winning players
   const nonWinners = sortedPlayers.filter(p => p.totalScore < highestScore);
   
   const gameStats = {
@@ -318,7 +327,20 @@ export const EndGameModal: React.FC<EndGameModalProps> = ({
     })()
   };
 
-  // Calculate individual player breakdowns
+  // Calculate player breakdown for single player
+  const singlePlayerBreakdown = singlePlayer ? {
+    ...singlePlayer,
+    breakdown: singlePlayer.history.reduce((acc, entry) => {
+      acc.roads += entry.scores.roads || 0;
+      acc.cities += entry.scores.cities || 0;
+      acc.monasteries += entry.scores.monasteries || 0;
+      acc.fields += entry.scores.fields || 0;
+      acc.other += entry.scores.other || 0;
+      return acc;
+    }, { roads: 0, cities: 0, monasteries: 0, fields: 0, other: 0 })
+  } : null;
+
+  // Calculate player breakdowns for multiplayer
   const playerBreakdowns = sortedPlayers.map((player) => {
     const breakdown = player.history.reduce((acc, entry) => {
       acc.roads += entry.scores.roads || 0;
@@ -329,7 +351,6 @@ export const EndGameModal: React.FC<EndGameModalProps> = ({
       return acc;
     }, { roads: 0, cities: 0, monasteries: 0, fields: 0, other: 0 });
     
-    // Determine position text
     let position;
     if (player.totalScore === highestScore) {
       position = isTie ? 'T1' : '1';
@@ -343,15 +364,16 @@ export const EndGameModal: React.FC<EndGameModalProps> = ({
 
   useEffect(() => {
     if (isOpen) {
+      // Start completely hidden
       setAnimationPhase('hidden');
       setVisibleStats(0);
       
       const timers = [
-        setTimeout(() => setAnimationPhase('visible'), 300),
-        setTimeout(() => setVisibleStats(1), 1000),
-        setTimeout(() => setVisibleStats(2), 1200),
-        setTimeout(() => setVisibleStats(3), 1400),
-        setTimeout(() => setVisibleStats(4), 1600),
+        // Everything starts together at the same time
+        setTimeout(() => {
+          setAnimationPhase('visible');
+          setVisibleStats(4); // Show all stats at once
+        }, 800),
       ];
       
       return () => timers.forEach(clearTimeout);
@@ -362,15 +384,10 @@ export const EndGameModal: React.FC<EndGameModalProps> = ({
   }, [isOpen]);
 
   const handleShare = async () => {
-    // Get the current URL parameters
     const currentUrl = new URL(window.location.href);
-    
-    // Set the endGame parameter to true
     currentUrl.searchParams.set('endGame', 'true');
     
-    // If there's no game parameter but we have a gameState, we need to encode it
     if (!currentUrl.searchParams.has('game') && gameState.players.length > 0) {
-      // Encode the current game state
       const gameStateData = {
         players: gameState.players,
         activePlayer: gameState.activePlayer,
@@ -382,9 +399,16 @@ export const EndGameModal: React.FC<EndGameModalProps> = ({
     }   
     const shareUrl = currentUrl.toString();
     
-    const shareText = isTie 
-      ? `Tie game! ${winners.map(w => w.getPlayerName()).join(' & ')} tied with ${highestScore} points!`
-      : `${winners[0].getPlayerName()} won with ${highestScore} points!`;
+    let shareText;
+    if (isSinglePlayer) {
+      shareText = playerWon 
+        ? `${singlePlayer?.getPlayerName()} won their Carcassonne game with ${singlePlayer?.totalScore} points! 🏆`
+        : `${singlePlayer?.getPlayerName()} played Carcassonne and scored ${singlePlayer?.totalScore} points! Good effort! 🎯`;
+    } else {
+      shareText = isTie 
+        ? `Tie game! ${winners.map(w => w.getPlayerName()).join(' & ')} tied with ${highestScore} points!`
+        : `${winners[0].getPlayerName()} won with ${highestScore} points!`;
+    }
     
     if (navigator.share) {
       try {
@@ -411,10 +435,226 @@ export const EndGameModal: React.FC<EndGameModalProps> = ({
 
   if (!isOpen) return null;
 
+  // Single Player Results Component
+  const SinglePlayerResults = () => (
+    <div className="p-6">
+      <div className="text-center mb-8">
+        {/* Result Icon */}
+        <div className={`text-6xl mb-4 transition-all duration-1000 ${
+          playerWon ? 'floating-crown' : 'gentle-sway'
+        } ${animationPhase === 'visible' ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`}>
+          {playerWon ? '🏆' : '🎯'}
+        </div>
+
+        {/* Player Meeple */}
+        <div className="relative mb-6">
+          <div 
+            className="w-20 h-20 mx-auto transition-all duration-1000 ease-out"
+            style={{ 
+              opacity: animationPhase === 'visible' ? 1 : 0,
+              transform: animationPhase === 'visible' ? 'scale(1) translateY(0px)' : 'scale(0.75) translateY(32px)',
+              transitionDelay: '0ms'
+            }}
+          >
+            <div className={`w-full h-full ${playerWon ? 'dancing-winner' : 'gentle-sway'}`}
+                 style={{ animationDelay: '1.0s' }}>
+              <Meeple color={singlePlayer?.color || '#5B9BD5'} className="w-full h-full drop-shadow-2xl" />
+            </div>
+            
+            {/* Floating Badge */}
+            <div 
+              className="absolute -top-3 -right-3 transition-all duration-1000 gentle-float"
+              style={{ 
+                opacity: animationPhase === 'visible' ? 1 : 0,
+                transform: animationPhase === 'visible' ? 'scale(1)' : 'scale(0)',
+                transitionDelay: '200ms'
+              }}
+            >
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center shadow-lg ${
+              playerWon 
+                ? 'bg-gradient-to-br from-yellow-400 to-yellow-600' 
+                : 'bg-gradient-to-br from-blue-400 to-purple-500'
+            }`}>
+              {playerWon ? (
+                <Trophy size={20} className="text-yellow-900" />
+              ) : (
+                <Star size={20} className="text-white" />
+              )}
+            </div>
+          </div>
+        </div>
+        </div>
+
+        {/* Result Text */}
+        <div className={`space-y-3 transition-all duration-1000 ${
+          animationPhase === 'visible' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+        }`} style={{ transitionDelay: '0ms' }}>
+          <h3 className="text-3xl font-bold text-znr-text">
+            {playerWon ? 'Victory!' : 'Great Effort!'}
+          </h3>
+          <div className="text-lg text-znr-text-muted">
+            {singlePlayer?.getPlayerName()}
+          </div>
+          <div className="mb-4">
+            <span className={`text-5xl font-bold bg-gradient-to-r ${
+              playerWon 
+                ? 'from-yellow-400 via-yellow-500 to-yellow-600' 
+                : 'from-blue-400 via-purple-500 to-purple-600'
+            } bg-clip-text text-transparent mr-2`}>
+              {singlePlayer?.totalScore}
+            </span>
+            <span className="text-znr-text-muted text-xl">pts</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Multiplayer Results Component
+  const MultiPlayerResults = () => (
+    <div className="p-6">
+      <div className="flex items-center justify-center gap-8 mb-6">
+        {/* Non-winners - Left Side */}
+        {nonWinners.length > 0 && (
+          <div className="flex flex-col gap-4">
+            {nonWinners.map((player, index) => {
+              const playerData = playerBreakdowns.find(p => p.id === player.id);
+              return (
+                <div 
+                  key={`non-winner-${player.id}`}
+                  className={`flex items-center gap-3 transition-all duration-800 ease-out ${
+                    animationPhase === 'visible' ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-12'
+                  }`}
+                  style={{ 
+                    transitionDelay: '0ms'
+                  }}
+                >
+                  <div className="text-znr-text-muted font-bold text-lg min-w-[2rem] text-center">#{playerData?.position}</div>
+                  <div className="w-8 h-8 flex-shrink-0">
+                    <Meeple color={player.color} className="w-full h-full opacity-80" />
+                  </div>
+                  <div className="text-left">
+                    <div className="text-znr-text text-base font-semibold">{player.name}</div>
+                    <div className="text-znr-text-muted text-sm font-medium">{player.totalScore} pts</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Winners - Center */}
+        <div className="text-center relative">
+          {/* Crown(s) */}
+          <div className={`text-5xl mb-1 transition-all duration-1000 floating-crown ${
+            animationPhase === 'visible' ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
+          }`}>
+            {isTie ? '👑👑' : '👑'}
+          </div>
+
+          {/* Winner Meeples */}
+          <div className="relative mb-0">
+            {isTie ? (
+              /* Multiple Winners Layout */
+              <div 
+                className="flex justify-center items-end gap-3 transition-all duration-1000 ease-out"
+                style={{ 
+                  opacity: animationPhase === 'visible' ? 1 : 0,
+                  transform: animationPhase === 'visible' ? 'scale(1) translateY(0px)' : 'scale(0.75) translateY(32px)',
+                  transitionDelay: '0ms'
+                }}
+              >
+                {winners.map((winner, index) => (
+                  <div key={winner.id} className="relative">
+                    <div className={`w-16 h-16 dancing-winner`} 
+                         style={{ animationDelay: `${1.0 + index * 0.2}s` }}>
+                      <Meeple color={winner.color} className="w-full h-full drop-shadow-2xl" />
+                    </div>
+                    {/* Individual Trophy for each winner */}
+                    <div 
+                      className="absolute -top-2 -right-2 transition-all duration-1000 gentle-float"
+                      style={{ 
+                        opacity: animationPhase === 'visible' ? 1 : 0,
+                        transform: animationPhase === 'visible' ? 'scale(1)' : 'scale(0)',
+                        transitionDelay: '200ms'
+                      }}
+                    >
+                    <div className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center shadow-lg">
+                      <Trophy size={12} className="text-yellow-900" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            ) : (
+              /* Single Winner Layout */
+              <div 
+                className={`w-18 h-18 mx-auto transition-all duration-1000 ease-out`}
+                style={{ 
+                  opacity: animationPhase === 'visible' ? 1 : 0,
+                  transform: animationPhase === 'visible' ? 'scale(1) translateY(0px)' : 'scale(0.75) translateY(32px)',
+                  transitionDelay: '0ms'
+                }}
+              >
+                <div className="w-full h-full dancing-winner" style={{ animationDelay: '1.0s' }}>
+                  <Meeple color={winners[0].color} className="w-full h-full drop-shadow-2xl" />
+                </div>
+                
+                {/* Floating Trophy */}
+                <div 
+                  className={`absolute -top-3 -right-3 transition-all duration-1000 gentle-float`}
+                  style={{ 
+                    animationDelay: '1.0s',
+                    opacity: animationPhase === 'visible' ? 1 : 0,
+                    transform: animationPhase === 'visible' ? 'scale(1)' : 'scale(0)',
+                    transitionDelay: '200ms'
+                  }}
+                >
+                  <div className="w-10 h-10 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center shadow-lg">
+                    <Trophy size={16} className="text-yellow-900" />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Winner Text */}
+          <div className={`space-y-3 transition-all duration-1000 ${
+            animationPhase === 'visible' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+          }`} style={{ transitionDelay: '0ms' }}>
+            <h3 className="text-2xl font-bold text-znr-text">
+              {isTie ? (
+                winners.length === 2 ? 
+                  `${winners[0].getPlayerName()} & ${winners[1].getPlayerName()} Tie!` :
+                  `${winners.length}-Way Tie!`
+              ) : (
+                `${winners[0].name} Wins!`
+              )}
+            </h3>
+            <div className="ml-4">
+              <span className="text-4xl font-bold bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 bg-clip-text text-transparent mr-2">
+                {highestScore}
+              </span>
+              <span className="text-znr-text-muted text-lg">pts</span>
+            </div>
+            {isTie && (
+              <div className="text-sm text-znr-text-muted mt-2">
+                Shared Victory in Carcassonne!
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Right Side - Empty Space */}
+        <div className="w-0 md:w-32 lg:w-48"></div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[120] p-4">
-      {/* tsParticles Fireworks Background */}
-      {particlesInit && animationPhase === 'visible' && (
+      {/* tsParticles Fireworks Background - only for wins or multiplayer */}
+      {particlesInit && animationPhase === 'visible' && (!isSinglePlayer || playerWon) && (
         <Particles
           id="fireworks"
           className="absolute inset-0 pointer-events-none"
@@ -451,150 +691,34 @@ export const EndGameModal: React.FC<EndGameModalProps> = ({
 
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto znr-scroll-enhanced">
-          {/* Winner/Tie Celebration Section */}
-          <div className="p-6">
-            <div className="flex items-center justify-center gap-8 mb-6">
-              {/* Non-winners - Left Side */}
-              {nonWinners.length > 0 && (
-                <div className="flex flex-col gap-4">
-                  {nonWinners.map((player, index) => {
-                    const playerData = playerBreakdowns.find(p => p.id === player.id);
-                    return (
-                      <div 
-                        key={`non-winner-${player.id}`}
-                        className={`flex items-center gap-3 transition-all duration-700 gentle-sway ${
-                          animationPhase === 'visible' ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'
-                        }`}
-                        style={{ 
-                          transitionDelay: `${index * 200 + 500}ms`,
-                          animationDelay: `${index * 0.5}s`
-                        }}
-                      >
-                        <div className="text-znr-text-muted font-bold text-lg min-w-[2rem] text-center">#{playerData?.position}</div>
-                        <div className="w-8 h-8 flex-shrink-0">
-                          <Meeple color={player.color} className="w-full h-full opacity-80" />
-                        </div>
-                        <div className="text-left">
-                          <div className="text-znr-text text-base font-semibold">{player.name}</div>
-                          <div className="text-znr-text-muted text-sm font-medium">{player.totalScore} pts</div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-
-              {/* Winners - Center */}
-              <div className="text-center relative">
-                {/* Crown(s) */}
-                <div className={`text-5xl mb-1 transition-all duration-1000 floating-crown ${
-                  animationPhase === 'visible' ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
-                }`}>
-                  {isTie ? '👑👑' : '👑'}
-                </div>
-
-                {/* Winner Meeples */}
-                <div className="relative mb-0">
-                  {isTie ? (
-                    /* Multiple Winners Layout */
-                    <div className={`flex justify-center items-end gap-3 transition-all duration-1000 dancing-winner ${
-                      animationPhase === 'visible' ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
-                    }`}>
-                      {winners.map((winner, index) => (
-                        <div key={winner.id} className="relative">
-                          <div className="w-16 h-16">
-                            <Meeple color={winner.color} className="w-full h-full drop-shadow-2xl" />
-                          </div>
-                          {/* Individual Trophy for each winner */}
-                          <div className={`absolute -top-2 -right-2 transition-all duration-1000 gentle-float ${
-                            animationPhase === 'visible' ? 'opacity-100 scale-100' : 'opacity-0 scale-0'
-                          }`} style={{ animationDelay: `${0.5 + index * 0.2}s` }}>
-                            <div className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center shadow-lg">
-                              <Trophy size={12} className="text-yellow-900" />
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    /* Single Winner Layout */
-                    <div className={`w-18 h-18 mx-auto transition-all duration-1000 dancing-winner ${
-                      animationPhase === 'visible' ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
-                    }`}>
-                      <Meeple color={winners[0].color} className="w-full h-full drop-shadow-2xl" />
-                      
-                      {/* Floating Trophy */}
-                      <div className={`absolute -top-3 -right-3 transition-all duration-1000 gentle-float ${
-                        animationPhase === 'visible' ? 'opacity-100 scale-100' : 'opacity-0 scale-0'
-                      }`} style={{ animationDelay: '0.5s' }}>
-                        <div className="w-10 h-10 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center shadow-lg">
-                          <Trophy size={16} className="text-yellow-900" />
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Winner Text */}
-                <div className={`space-y-3 transition-all duration-1000 ${
-                  animationPhase === 'visible' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-                }`} style={{ transitionDelay: '300ms' }}>
-                  <h3 className="text-2xl font-bold text-znr-text">
-                    {isTie ? (
-                      winners.length === 2 ? 
-                        `${winners[0].getPlayerName()} & ${winners[1].getPlayerName()} Tie!` :
-                        `${winners.length}-Way Tie!`
-                    ) : (
-                      `${winners[0].name} Wins!`
-                    )}
-                  </h3>
-                  <div className="ml-4">
-                    <span className="text-4xl font-bold bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 bg-clip-text text-transparent mr-2">
-                      {highestScore}
-                    </span>
-                    <span className="text-znr-text-muted text-lg">pts</span>
-                  </div>
-                  {isTie && (
-                    <div className="text-sm text-znr-text-muted mt-2">
-                      Shared Victory in Carcassonne!
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Right Side - Empty Space (or could add decorative elements) */}
-              <div className="w-0 md:w-32 lg:w-48">
-                {/* This space remains empty to balance the layout */}
-              </div>
-            </div>
-          </div>
+          {/* Results Section - Different for single vs multiplayer */}
+          {isSinglePlayer ? <SinglePlayerResults /> : <MultiPlayerResults />}
 
           {/* Game Statistics Section */}
           <div className={`px-6 pb-6 transition-all duration-1000 ${
             animationPhase === 'visible' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-          }`} style={{ transitionDelay: '800ms' }}>
+          }`} style={{ transitionDelay: '0ms' }}>
             <div className="bg-znr-tertiary/50 backdrop-blur-sm rounded-2xl p-6 border border-znr-border">
               <h4 className="text-xl font-semibold text-znr-text mb-4 flex items-center gap-3">
                 <TrendingUp size={20} />
-                Game Statistics
+                {isSinglePlayer ? 'Your Game Stats' : 'Game Statistics'}
               </h4>
               
               {/* Overall Stats Grid */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 {[
-                  { icon: Clock, color: 'text-blue-400', value: gameStats.totalTurns, label: 'Total Turns' },
+                  { icon: Clock, color: 'text-blue-400', value: gameStats.totalTurns, label: isSinglePlayer ? 'Turns Played' : 'Total Turns' },
                   { icon: Target, color: 'text-green-400', value: gameStats.highestSingleTurn, label: 'Best Turn' },
-                  { icon: Users, color: 'text-purple-400', value: gameStats.averageScore, label: 'Avg Score' },
+                  { icon: Users, color: 'text-purple-400', value: gameStats.averageScore, label: isSinglePlayer ? 'Final Score' : 'Avg Score' },
                   { icon: () => <span className="text-lg">{gameStats.mostProductiveCategory.icon}</span>, color: 'text-yellow-400', value: gameStats.mostProductiveCategory.value, label: gameStats.mostProductiveCategory.name }
                 ].map((stat, index) => (
                   <div 
                     key={index}
-                    className={`text-center p-3 bg-znr-elevated/50 rounded-xl transition-all duration-500 ${
-                      visibleStats > index ? 'opacity-100' : 'opacity-0'
+                    className={`text-center p-3 bg-znr-elevated/50 rounded-xl transition-all duration-800 ${
+                      visibleStats > index ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
                     }`}
                     style={{ 
-                      transitionDelay: `${index * 200}ms`,
-                      animationDelay: `${index * 0.8}s`
+                      transitionDelay: '0ms'
                     }}
                   >
                     <stat.icon size={20} className={`mx-auto mb-2 ${stat.color}`} />
@@ -604,46 +728,37 @@ export const EndGameModal: React.FC<EndGameModalProps> = ({
                 ))}
               </div>
 
-              {/* Detailed Player Breakdowns */}
+              {/* Player Breakdown - Single Player vs Multiplayer */}
               <div className="space-y-3">
-                <h5 className="text-lg font-semibold text-znr-text mb-3">Player Breakdowns</h5>
-                {playerBreakdowns.map((player, playerIndex) => (
-                  <div 
-                    key={player.id} 
-                    className={`bg-znr-elevated/50 rounded-xl p-4 transition-all duration-500 ${
-                      visibleStats > 0 ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
-                    } ${player.totalScore === highestScore ? 'ring-2 ring-yellow-400/30 bg-yellow-500/5' : ''}`}
-                    style={{ transitionDelay: `${(playerIndex + 1) * 150}ms` }}
-                  >
+                <h5 className="text-lg font-semibold text-znr-text mb-3">
+                  {isSinglePlayer ? 'Score Breakdown' : 'Player Breakdowns'}
+                </h5>
+                
+                {isSinglePlayer && singlePlayerBreakdown ? (
+                  /* Single Player Breakdown */
+                  <div className={`bg-znr-elevated/50 rounded-xl p-4 transition-all duration-800 ${
+                    playerWon ? 'ring-2 ring-yellow-400/30 bg-yellow-500/5' : 'ring-2 ring-blue-400/30 bg-blue-500/5'
+                  } ${visibleStats > 0 ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'}`}
+                  style={{ transitionDelay: '0ms' }}>
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-3">
-                        <div className={`font-bold w-8 text-sm text-center ${
-                          player.totalScore === highestScore ? 'text-yellow-400' : 'text-znr-text-muted'
-                        }`}>
-                          #{player.position}
-                        </div>
-                        <div className="w-8 h-8">
-                          <Meeple color={player.color} className="w-full h-full" />
+                        <div className="w-10 h-10">
+                          <Meeple color={singlePlayerBreakdown.color} className="w-full h-full" />
                         </div>
                         <div>
-                          <span className={`font-semibold ${
-                            player.totalScore === highestScore ? 'text-yellow-300' : 'text-znr-text'
+                          <span className={`font-semibold text-lg ${
+                            playerWon ? 'text-yellow-300' : 'text-blue-300'
                           }`}>
-                            {player.name}
-                            {player.totalScore === highestScore && isTie && (
-                              <span className="text-xs text-yellow-400 ml-2">👑 WINNER</span>
-                            )}
-                            {player.totalScore === highestScore && !isTie && (
-                              <span className="text-xs text-yellow-400 ml-2">👑 WINNER</span>
-                            )}
+                            {singlePlayerBreakdown.name}
+                            {playerWon && <span className="text-xs text-yellow-400 ml-2">🏆 VICTORY</span>}
                           </span>
-                          <div className="text-znr-text-muted text-xs">{player.history.length} turns</div>
+                          <div className="text-znr-text-muted text-sm">{singlePlayerBreakdown.history.length} turns</div>
                         </div>
                       </div>
-                      <div className={`text-xl font-bold ${
-                        player.totalScore === highestScore ? 'text-yellow-300' : 'text-znr-text'
+                      <div className={`text-2xl font-bold ${
+                        playerWon ? 'text-yellow-300' : 'text-blue-300'
                       }`}>
-                        {player.totalScore}
+                        {singlePlayerBreakdown.totalScore}
                       </div>
                     </div>
                     
@@ -652,13 +767,64 @@ export const EndGameModal: React.FC<EndGameModalProps> = ({
                       {scoreCategories.map(category => (
                         <div key={category.key} className="bg-znr-secondary/50 rounded-lg p-2 text-center">
                           <div className={`text-sm mb-1 ${category.color}`}>{category.icon}</div>
-                          <div className="text-lg font-bold text-znr-text">{player.breakdown[category.key]}</div>
+                          <div className="text-lg font-bold text-znr-text">{singlePlayerBreakdown.breakdown[category.key]}</div>
                           <div className="text-xs text-znr-text-muted">{category.label}</div>
                         </div>
                       ))}
                     </div>
                   </div>
-                ))}
+                ) : (
+                  /* Multiplayer Breakdowns */
+                  playerBreakdowns.map((player, playerIndex) => (
+                    <div 
+                      key={player.id} 
+                      className={`bg-znr-elevated/50 rounded-xl p-4 transition-all duration-800 ${
+                        visibleStats > 0 ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
+                      } ${player.totalScore === highestScore ? 'ring-2 ring-yellow-400/30 bg-yellow-500/5' : ''}`}
+                      style={{ transitionDelay: '0ms' }}
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className={`font-bold w-8 text-sm text-center ${
+                            player.totalScore === highestScore ? 'text-yellow-400' : 'text-znr-text-muted'
+                          }`}>
+                            #{player.position}
+                          </div>
+                          <div className="w-8 h-8">
+                            <Meeple color={player.color} className="w-full h-full" />
+                          </div>
+                          <div>
+                            <span className={`font-semibold ${
+                              player.totalScore === highestScore ? 'text-yellow-300' : 'text-znr-text'
+                            }`}>
+                              {player.name}
+                              {player.totalScore === highestScore && (
+                                <span className="text-xs text-yellow-400 ml-2">👑 WINNER</span>
+                              )}
+                            </span>
+                            <div className="text-znr-text-muted text-xs">{player.history.length} turns</div>
+                          </div>
+                        </div>
+                        <div className={`text-xl font-bold ${
+                          player.totalScore === highestScore ? 'text-yellow-300' : 'text-znr-text'
+                        }`}>
+                          {player.totalScore}
+                        </div>
+                      </div>
+                      
+                      {/* Category Breakdown */}
+                      <div className="grid grid-cols-5 gap-2">
+                        {scoreCategories.map(category => (
+                          <div key={category.key} className="bg-znr-secondary/50 rounded-lg p-2 text-center">
+                            <div className={`text-sm mb-1 ${category.color}`}>{category.icon}</div>
+                            <div className="text-lg font-bold text-znr-text">{player.breakdown[category.key]}</div>
+                            <div className="text-xs text-znr-text-muted">{category.label}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           </div>
@@ -666,7 +832,7 @@ export const EndGameModal: React.FC<EndGameModalProps> = ({
           {/* Action Buttons */}
           <div className={`px-6 pb-6 transition-all duration-1000 ${
             animationPhase === 'visible' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-          }`} style={{ transitionDelay: '1000ms' }}>
+          }`} style={{ transitionDelay: '0ms' }}>
             <div className="bg-znr-tertiary/30 rounded-2xl p-4 border border-znr-border">
               <h5 className="text-lg font-semibold text-znr-text mb-3">What's Next?</h5>
               <div className="flex gap-3 flex-wrap">
@@ -676,8 +842,12 @@ export const EndGameModal: React.FC<EndGameModalProps> = ({
                 >
                   <RotateCcw size={18} className="text-amber-400" />
                   <div className="text-left">
-                    <div className="font-medium text-sm">Restart Game</div>
-                    <div className="text-xs text-znr-text-muted">Same players, fresh scores</div>
+                    <div className="font-medium text-sm">
+                      {isSinglePlayer ? 'Play Again' : 'Restart Game'}
+                    </div>
+                    <div className="text-xs text-znr-text-muted">
+                      {isSinglePlayer ? 'Same player, fresh start' : 'Same players, fresh scores'}
+                    </div>
                   </div>
                 </button>
                 
@@ -688,7 +858,9 @@ export const EndGameModal: React.FC<EndGameModalProps> = ({
                   <Plus size={18} className="text-blue-400" />
                   <div className="text-left">
                     <div className="font-medium text-sm">New Game</div>
-                    <div className="text-xs text-znr-text-muted">Setup new players</div>
+                    <div className="text-xs text-znr-text-muted">
+                      {isSinglePlayer ? 'Change player or add more' : 'Setup new players'}
+                    </div>
                   </div>
                 </button>
               </div>

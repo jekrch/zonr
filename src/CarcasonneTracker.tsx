@@ -28,6 +28,7 @@ const CarcassonneTracker: React.FC = () => {
 
   const [editingEntry, setEditingEntry] = useState<ScoreEntry | null>(null);
   const [showEndGame, setShowEndGame] = useState(false);
+  const [playerWon, setPlayerWon] = useState<boolean | undefined>(undefined);
 
   // Check URL for endGame parameter on mount and when URL changes
   useEffect(() => {
@@ -62,7 +63,8 @@ const CarcassonneTracker: React.FC = () => {
     createGame(players);
   };
 
-  const handleEndGame = (): void => {
+  const handleEndGame = (playerWon?: boolean): void => {
+    setPlayerWon(playerWon);
     setShowEndGame(true);
     setEndGameInURL(true);
   };
@@ -123,6 +125,7 @@ const CarcassonneTracker: React.FC = () => {
       />
       <EndGameModal
         isOpen={showEndGame}
+        playerWon={playerWon}
         onClose={handleCloseEndGame}
         onBackToGame={handleBackToGame}
         onRestartGame={() => {

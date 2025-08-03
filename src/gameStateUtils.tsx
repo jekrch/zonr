@@ -107,7 +107,7 @@ export const decodeGameState = (encoded: string): { gameState: GameState | null;
     }
     
     const playerParts = playerSection.split('_');
-    if (playerParts.length < 3) {
+    if (playerParts.length < 2) {  // Changed from 3 to 2
       return { gameState: null, theme };
     }
     
